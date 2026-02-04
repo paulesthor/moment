@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Espace | Moments d'Évasion</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Montserrat:wght@300;400;500;600&display=block"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 120px auto 40px;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 40px;
+        }
+
+        .sidebar {
+            background: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            height: fit-content;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-item {
+            margin-bottom: 10px;
+        }
+
+        .sidebar-link {
+            display: block;
+            padding: 10px 15px;
+            border-radius: 8px;
+            color: var(--color-text-secondary);
+            font-weight: 500;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .sidebar-link:hover,
+        .sidebar-link.active {
+            background: var(--color-bg-secondary);
+            color: var(--color-primary-dark);
+        }
+
+        .content-area {
+            background: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            min-height: 500px;
+        }
+
+        /* Chat Styles */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 500px;
+        }
+
+        .chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: var(--color-bg-primary);
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            max-width: 70%;
+            padding: 10px 15px;
+            border-radius: 15px;
+            position: relative;
+            line-height: 1.5;
+            font-size: 0.95rem;
+        }
+
+        .message.sent {
+            align-self: flex-end;
+            background: var(--color-primary);
+            color: white;
+            border-bottom-right-radius: 2px;
+        }
+
+        .message.received {
+            align-self: flex-start;
+            background: white;
+            color: var(--color-text-primary);
+            border: 1px solid #eee;
+            border-bottom-left-radius: 2px;
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            margin-top: 5px;
+            opacity: 0.8;
+            text-align: right;
+        }
+
+        .chat-input-area {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex-grow: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            font-family: inherit;
+        }
+
+        .chat-send-btn {
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .chat-send-btn:hover {
+            background: var(--color-primary-dark);
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation (Copied from index.html structure) -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <img src="Gemini_Generated_Image_36tfxk36tfxk36tf-removebg-preview.png" alt="Moments d'Évasion"
+                    style="height: 65px; width: 155px; min-width: 155px; display: block;">
+            </a>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html" class="nav-link">Accueil</a></li>
+                <li><a href="massage-ayurvedique.html" class="nav-link">Massage Ayurvédique</a></li>
+                <li><a href="amma-assis.html" class="nav-link">Amma Assis</a></li>
+                <li><a href="massage-prenatal.html" class="nav-link">Massage Prénatal</a></li>
+                <li><a href="magnetisme-reiki.html" class="nav-link">Magnétisme & Reiki</a></li>
+                <li><a href="tarifs.html" class="nav-link">Tarifs</a></li>
+                <li><a href="a-propos.html" class="nav-link">À Propos</a></li>
+                <li><a href="temoignages.html" class="nav-link">Témoignages</a></li>
+                <li><a href="contact.html" class="nav-link nav-cta">Contact</a></li>
+                <!-- User Menu updated by auth.js -->
+            </ul>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <ul class="sidebar-menu">
+                <li class="sidebar-item">
+                    <a class="sidebar-link active" onclick="switchTab('messages')">💬 Mes Messages</a>
+                </li>
+                <li class="sidebar-item">
+                    <a class="sidebar-link" onclick="switchTab('booking')">📅 Mes Rendez-vous</a>
+                </li>
+                <li class="sidebar-item">
+                    <a class="sidebar-link" onclick="switchTab('profile')">👤 Mon Profil</a>
+                </li>
+            </ul>
+        </aside>
+
+        <main class="content-area" id="mainContent">
+            <!-- Messages View -->
+            <div id="view-messages">
+                <h2 style="margin-bottom: 20px; color: var(--color-primary-dark);">Messagerie</h2>
+                <div class="chat-container">
+                    <div class="chat-messages" id="chatMessages">
+                        <div style="text-align: center; color: var(--color-text-secondary); margin-top: 50px;">
+                            Chargement des messages...
+                        </div>
+                    </div>
+                    <form class="chat-input-area" id="chatForm">
+                        <input type="text" class="chat-input" id="messageInput" placeholder="Écrivez votre message..."
+                            required autocomplete="off">
+                        <button type="submit" class="chat-send-btn">➤</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Booking & History View -->
+            <div id="view-booking" style="display: none;">
+                <h2 class="section-title" style="margin-top:0;">Mes Rendez-vous</h2>
+
+                <!-- Upcoming List -->
+                <div style="margin-bottom: 30px;">
+                    <h3
+                        style="font-size: 1.1rem; color: var(--color-primary-dark); margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 5px;">
+                        📅 À venir</h3>
+                    <div id="upcoming-apts"
+                        style="display: grid; gap: 15px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));">
+                        <p style="color: #666; font-style: italic;">Chargement...</p>
+                    </div>
+                </div>
+
+                <!-- New Booking Form -->
+                <div
+                    style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 40px; border-left: 4px solid var(--color-primary);">
+                    <h3 style="margin-bottom: 20px;">Demander un nouveau rendez-vous</h3>
+                    <form id="bookingForm" class="contact-form" style="max-width: 100%;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div class="form-group">
+                                <label class="form-label"
+                                    style="display: block; margin-bottom: 5px; font-weight:500;">Type de Soin</label>
+                                <select id="apt-service" class="form-input"
+                                    style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"
+                                    required>
+                                    <option value="Massage Ayurvédique">Massage Ayurvédique</option>
+                                    <option value="Amma Assis">Amma Assis</option>
+                                    <option value="Massage Prénatal">Massage Prénatal</option>
+                                    <option value="Magnétisme">Magnétisme / Reiki</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label"
+                                    style="display: block; margin-bottom: 5px; font-weight:500;">Date & Heure
+                                    souhaitée</label>
+                                <input type="datetime-local" id="apt-date" class="form-input"
+                                    style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"
+                                    required>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-top: 15px;">
+                            <label class="form-label"
+                                style="display: block; margin-bottom: 5px; font-weight:500;">Message /
+                                Précisions</label>
+                            <textarea id="apt-notes" class="form-textarea"
+                                placeholder="Précisez vos disponibilités ou besoins particuliers..." rows="2"
+                                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 20px;">Envoyer la
+                            demande</button>
+                        <div id="bookingMsg" style="margin-top: 15px; text-align: center;"></div>
+                    </form>
+                </div>
+
+                <!-- History List -->
+                <div>
+                    <h3
+                        style="font-size: 1.1rem; color: #999; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 5px;">
+                        📜 Historique</h3>
+                    <div id="past-apts" style="display: flex; flex-direction: column; gap: 10px;">
+                        <p style="color: #999; font-style: italic;">Aucun historique.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile View (Hidden) -->
+            <div id="view-profile" style="display: none;">
+                <h2 style="margin-bottom: 20px; color: var(--color-primary-dark);">Mon Profil</h2>
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label class="form-label" style="display:block; margin-bottom: 5px;">Nom complet</label>
+                    <input type="text" class="form-input" id="profileName" readonly
+                        style="background: #f9f9f9; width: 100%; padding: 10px; border:1px solid #ddd; border-radius:5px;">
+                </div>
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label class="form-label" style="display:block; margin-bottom: 5px;">Email</label>
+                    <input type="email" class="form-input" id="profileEmail" readonly
+                        style="background: #f9f9f9; width: 100%; padding: 10px; border:1px solid #ddd; border-radius:5px;">
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Logic -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module" src="js/auth.js"></script>
+    <script type="module">
+        import { supabase } from './js/config.js';
+
+        let currentUser = null;
+
+        // Tab Switching
+        window.switchTab = (tab) => {
+            document.querySelectorAll('.sidebar-link').forEach(el => el.classList.remove('active'));
+            event.target.classList.add('active');
+
+            document.getElementById('view-messages').style.display = 'none';
+            document.getElementById('view-booking').style.display = 'none';
+            document.getElementById('view-profile').style.display = 'none';
+
+            if (tab === 'messages') {
+                document.getElementById('view-messages').style.display = 'block';
+                scrollToBottom();
+            } else if (tab === 'booking') {
+                document.getElementById('view-booking').style.display = 'block';
+                loadClientAppointments();
+            } else {
+                document.getElementById('view-profile').style.display = 'block';
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // 1. Check Session
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                // Save current URL to redirect back after login
+                const currentUrl = encodeURIComponent(window.location.href);
+                window.location.href = `login.html?redirect=${currentUrl}`;
+                return;
+            }
+            currentUser = session.user;
+
+            document.getElementById('profileEmail').value = currentUser.email;
+            document.getElementById('profileName').value = currentUser.user_metadata?.full_name || '';
+
+            // 2. Check URL params for tab PRIORITIZATION
+            const urlParams = new URLSearchParams(window.location.search);
+            let tabParam = urlParams.get('tab');
+            let serviceParam = urlParams.get('service');
+
+            // FALLBACK: Check LocalStorage (if URL params were stripped)
+            const storedIntent = localStorage.getItem('booking_intent');
+            if (!tabParam && storedIntent) {
+                console.log('Found stored booking intent:', storedIntent);
+                tabParam = 'booking';
+                serviceParam = storedIntent;
+                // Clear it so it doesn't persist forever
+                localStorage.removeItem('booking_intent');
+            }
+
+            console.log('Loading Dashboard. Tab:', tabParam, 'Service:', serviceParam);
+
+            if (tabParam === 'booking') {
+                // FORCE SWITCH TO BOOKING
+                document.getElementById('view-messages').style.display = 'none';
+                document.getElementById('view-booking').style.display = 'block';
+                document.getElementById('view-profile').style.display = 'none';
+
+                // Update Sidebar Active State
+                document.querySelectorAll('.sidebar-link').forEach(el => el.classList.remove('active'));
+                const bookingTab = document.querySelector('.sidebar-link[onclick*="booking"]');
+                if (bookingTab) bookingTab.classList.add('active');
+
+                // Pre-select service if param exists
+                if (serviceParam) {
+                    const select = document.getElementById('apt-service');
+                    // Add delay to ensure DOM is ready? No, it should be ready.
+                    if (select) {
+                        select.value = serviceParam;
+                        // Fallback logic
+                        if (select.value !== serviceParam) {
+                            for (let i = 0; i < select.options.length; i++) {
+                                // loose matching
+                                if (select.options[i].value.includes(serviceParam) || serviceParam.includes(select.options[i].value)) {
+                                    select.selectedIndex = i;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                loadClientAppointments();
+            } else {
+                // Default to Messages ONLY if no tab param
+                document.getElementById('view-messages').style.display = 'block';
+                document.getElementById('view-booking').style.display = 'none';
+                document.getElementById('view-profile').style.display = 'none';
+
+                document.querySelectorAll('.sidebar-link').forEach(el => el.classList.remove('active'));
+                const msgTab = document.querySelector('.sidebar-link[onclick*="messages"]');
+                if (msgTab) msgTab.classList.add('active');
+
+                loadMessages();
+                subscribeToMessages();
+            }
+        });
+
+        /* --- APPOINTMENTS LOGIC --- */
+        async function loadClientAppointments() {
+            if (!currentUser) return;
+
+            const { data: apts } = await supabase
+                .from('appointments')
+                .select('*')
+                .eq('client_id', currentUser.id)
+                .order('start_time', { ascending: true }); // ASC for correct timeline
+
+            const upcomingContainer = document.getElementById('upcoming-apts');
+            const pastContainer = document.getElementById('past-apts');
+
+            if (!apts || apts.length === 0) {
+                upcomingContainer.innerHTML = '<p style="color: #666; font-style: italic;">Aucun rendez-vous à venir.</p>';
+                pastContainer.innerHTML = '<p style="color: #999; font-style: italic;">Aucun historique.</p>';
+                return;
+            }
+
+            const now = new Date();
+            const upcoming = apts.filter(a => new Date(a.start_time) >= now);
+            const past = apts.filter(a => new Date(a.start_time) < now).reverse(); // Recent past first
+
+            /* Upcoming */
+            if (upcoming.length === 0) {
+                upcomingContainer.innerHTML = '<p style="color: #666; font-style: italic;">Aucun rendez-vous à venir.</p>';
+            } else {
+                upcomingContainer.innerHTML = upcoming.map(a => `
+                    <div style="background: white; border: 1px solid #e0e0e0; border-left: 4px solid var(--color-primary); padding: 15px; border-radius: 8px;">
+                        <div style="font-weight: 600; color: var(--color-primary-dark); margin-bottom: 5px;">
+                            ${new Date(a.start_time).toLocaleDateString()} à ${new Date(a.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </div>
+                        <div style="margin-bottom: 5px; font-weight: 500;">
+                            ${(a.notes || '').split('.')[0]}
+                        </div>
+                        <div style="font-size: 0.85rem; color: ${a.status === 'confirmé' ? '#27ae60' : '#f39c12'}; font-weight: 600;">
+                            ${a.status.toUpperCase()}
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            /* Past */
+            if (past.length === 0) {
+                pastContainer.innerHTML = '<p style="color: #999; font-style: italic;">Aucun historique.</p>';
+            } else {
+                pastContainer.innerHTML = past.map(a => `
+                    <div style="background: #f9f9f9; padding: 10px 15px; border-radius: 8px; display:flex; justify-content:space-between; align-items:center; opacity: 0.7;">
+                        <div>
+                            <span style="font-weight: 600; color: #777;">${new Date(a.start_time).toLocaleDateString()}</span>
+                            <span style="color: #888; margin-left:10px; font-size:0.9rem;">${(a.notes || 'Soin').split('.')[0]}</span>
+                        </div>
+                        <span style="font-size: 0.8rem; background: #eee; padding: 2px 8px; border-radius: 10px; color: #777;">Terminé</span>
+                    </div>
+                `).join('');
+            }
+        }
+
+        document.getElementById('bookingForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const msgEl = document.getElementById('bookingMsg');
+            msgEl.innerText = 'Envoi en cours...';
+
+            const service = document.getElementById('apt-service').value;
+            const date = document.getElementById('apt-date').value;
+            // Notes are optional
+            const notes = document.getElementById('apt-notes').value;
+
+            // Simple validation
+            if (!date) { msgEl.innerText = "Date manquante !"; return; }
+
+            const { data: apt, error: aptError } = await supabase
+                .from('appointments')
+                .insert({
+                    client_id: currentUser.id,
+                    start_time: new Date(date).toISOString(),
+                    status: 'demandé', // Changed to 'demandé' to reflect it's a request
+                    notes: `Service: ${service}. ${notes}`
+                });
+
+            if (aptError) {
+                msgEl.innerText = 'Erreur: ' + aptError.message;
+                msgEl.style.color = 'red';
+                return;
+            }
+
+            // Insert Chat Message
+            const messageContent = `📅 J'ai demandé un rendez-vous pour le ${new Date(date).toLocaleDateString()} à ${new Date(date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} (${service}).`;
+            await supabase.from('messages').insert({
+                user_id: currentUser.id,
+                sender_id: currentUser.id,
+                content: messageContent
+            });
+
+            // Success UI
+            msgEl.innerText = 'Demande envoyée ! Redirection...';
+            msgEl.style.color = 'green';
+            document.getElementById('bookingForm').reset();
+            loadClientAppointments(); // Refresh local list immediately
+
+            setTimeout(() => {
+                msgEl.innerText = '';
+                // Optional: redirect to messages or stay here
+                // document.querySelector('.sidebar-link[onclick*="messages"]').click();
+            }, 1500);
+        });
+
+        /* --- MESSAGES LOGIC --- */
+        async function loadMessages() {
+            const container = document.getElementById('chatMessages');
+
+            const { data, error } = await supabase
+                .from('messages')
+                .select('*')
+                .eq('user_id', currentUser.id)
+                .order('created_at', { ascending: true });
+
+            if (error) {
+                container.innerHTML = '<p>Erreur.</p>';
+                return;
+            }
+
+            if (data.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: var(--color-text-secondary); margin-top: 50px;">Aucun message. Écrivez-nous pour commencer !</div>';
+                return;
+            }
+
+            container.innerHTML = '';
+            data.forEach(msg => appendMessage(msg));
+            scrollToBottom();
+        }
+
+        document.getElementById('chatForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const input = document.getElementById('messageInput');
+            const content = input.value.trim();
+            if (!content) return;
+            input.value = '';
+
+            const { error } = await supabase
+                .from('messages')
+                .insert({
+                    user_id: currentUser.id,
+                    sender_id: currentUser.id,
+                    content: content
+                });
+        });
+
+        function appendMessage(msg) {
+            const container = document.getElementById('chatMessages');
+            if (container.children.length === 1 && container.innerText.includes('Aucun message')) {
+                container.innerHTML = '';
+            }
+
+            const div = document.createElement('div');
+            const isMe = msg.sender_id === currentUser.id;
+
+            div.className = `message ${isMe ? 'sent' : 'received'}`;
+            div.innerHTML = `
+                ${msg.content}
+                <div class="message-time">
+                    ${new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </div>
+            `;
+            container.appendChild(div);
+            scrollToBottom();
+        }
+
+        function scrollToBottom() {
+            const container = document.getElementById('chatMessages');
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function subscribeToMessages() {
+            supabase
+                .channel('public:messages')
+                .on('postgres_changes', {
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'messages',
+                    filter: `user_id=eq.${currentUser.id}`
+                }, (payload) => {
+                    appendMessage(payload.new);
+                })
+                .subscribe();
+        }
+    </script>
+</body>
+
+</html>

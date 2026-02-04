@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion | Moments d'Évasion</title>
+    <!-- Same fonts and styles as main site -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Montserrat:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        body {
+            background-color: var(--color-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .login-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .login-logo {
+            width: 80px;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--color-primary-dark);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .login-btn {
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        #error-msg {
+            color: #e74c3c;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="login-card">
+        <a href="index.html">
+            <img src="Gemini_Generated_Image_36tfxk36tfxk36tf-removebg-preview.png" alt="Logo" class="login-logo">
+        </a>
+        <h2 style="font-family: 'Cormorant Garamond', serif; color: var(--color-primary-dark); margin-bottom: 1.5rem;">
+            Connexion</h2>
+
+        <form id="login-form">
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" id="email" class="form-input" required placeholder="votre@email.com">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Mot de passe</label>
+                <input type="password" id="password" class="form-input" required placeholder="••••••••">
+            </div>
+
+            <button type="submit" class="btn btn-primary login-btn">Se Connecter</button>
+            <div id="error-msg"></div>
+        </form>
+
+        <div style="margin-top: 1.5rem; font-size: 0.9rem; color: var(--color-text-secondary);">
+            Pas encore de compte ? <a href="register.html"
+                style="font-weight: 600; color: var(--color-primary);">S'inscrire</a>
+        </div>
+
+        <p style="margin-top: 1rem; font-size: 0.9rem;">
+            <a href="index.html" style="color: var(--color-primary);">← Retour au site</a>
+        </p>
+    </div>
+
+    <!-- Login Logic -->
+    <script type="module">
+        import { supabase } from './js/config.js';
+
+        const loginForm = document.getElementById('login-form');
+        const errorMsg = document.getElementById('error-msg');
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            errorMsg.style.display = 'none';
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email,
+                    password
+                });
+
+                if (error) throw error;
+
+                // Redirect logic
+                const urlParams = new URLSearchParams(window.location.search);
+                const redirectTarget = urlParams.get('redirect');
+
+                if (redirectTarget) {
+                    window.location.href = decodeURIComponent(redirectTarget);
+                } else if (isAdmin) {
+                    window.location.href = 'admin-dashboard.html';
+                } else {
+                    window.location.href = 'dashboard.html';
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                errorMsg.textContent = 'Erreur: ' + error.message;
+                errorMsg.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+
+</html>

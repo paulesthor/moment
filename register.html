@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription | Moments d'Évasion</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Montserrat:wght@300;400;500;600&display=block"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="login-container"
+        style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--color-bg-secondary); padding: 20px;">
+        <div class="glass-card" style="width: 100%; max-width: 400px; padding: 2.5rem; background: white;">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <a href="index.html">
+                    <img src="Gemini_Generated_Image_36tfxk36tfxk36tf-removebg-preview.png" alt="Logo"
+                        style="height: 60px; margin-bottom: 1rem;">
+                </a>
+                <h1 style="font-size: 1.8rem; margin-bottom: 0.5rem;">Créer un compte</h1>
+                <p style="color: var(--color-text-secondary);">Rejoignez-nous pour gérer vos rendez-vous</p>
+            </div>
+
+            <form id="registerForm">
+                <div class="form-group">
+                    <label class="form-label" for="fullName">Nom complet</label>
+                    <input type="text" id="fullName" class="form-input" required placeholder="Votre nom">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="email">Email</label>
+                    <input type="email" id="email" class="form-input" required placeholder="votre@email.com">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password">Mot de passe</label>
+                    <input type="password" id="password" class="form-input" required placeholder="••••••••">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="confirmPassword">Confirmer le mot de passe</label>
+                    <input type="password" id="confirmPassword" class="form-input" required placeholder="••••••••">
+                </div>
+
+                <button type="submit" class="btn btn-primary"
+                    style="width: 100%; justify-content: center;">S'inscrire</button>
+
+                <div id="message" style="margin-top: 1rem; text-align: center; font-size: 0.9rem;"></div>
+            </form>
+
+            <div style="margin-top: 2rem; text-align: center; font-size: 0.9rem; color: var(--color-text-secondary);">
+                Déjà un compte ? <a href="login.html" style="font-weight: 600;">Se connecter</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module">
+        import { supabase } from './js/config.js';
+
+        const registerForm = document.getElementById('registerForm');
+        const messageEl = document.getElementById('message');
+
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            messageEl.textContent = 'Création du compte...';
+            messageEl.style.color = 'var(--color-text-secondary)';
+
+            const fullName = document.getElementById('fullName').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (password !== confirmPassword) {
+                messageEl.textContent = 'Les mots de passe ne correspondent pas.';
+                messageEl.style.color = '#e74c3c';
+                return;
+            }
+
+            try {
+                const { data, error } = await supabase.auth.signUp({
+                    email,
+                    password,
+                    options: {
+                        data: {
+                            full_name: fullName
+                        }
+                    }
+                });
+
+                if (error) throw error;
+
+                messageEl.textContent = 'Compte créé avec succès ! Redirection...';
+                messageEl.style.color = '#27ae60';
+
+                setTimeout(() => {
+                    window.location.href = 'index.html'; // Or dashboard.html logic checks auth
+                }, 1500);
+
+            } catch (error) {
+                console.error('Error:', error);
+                messageEl.textContent = error.message;
+                messageEl.style.color = '#e74c3c';
+            }
+        });
+    </script>
+</body>
+
+</html>
