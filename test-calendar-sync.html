@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Diagnostic Synchro Google Calendar</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            background: #f4f6f8;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .success {
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .error {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .warning {
+            color: #f39c12;
+            font-weight: bold;
+        }
+
+        button {
+            padding: 10px 20px;
+            cursor: pointer;
+            background: #333;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+
+        pre {
+            background: #eee;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0"></script>
+    <script type="module">
+        import { supabase } from './js/config.js';
+
+        async function runDiagnostic() {
+            const logs = document.getElementById('logs');
+            const log = (msg, type = 'info') => {
+                const div = document.createElement('div');
+                div.innerHTML = msg;
+                div.className = type;
+                div.style.marginBottom = '5px';
+                logs.appendChild(div);
+            };
+
+            log('🏁 Démarrage du diagnostic...', 'info');
+
+            // 1. Check Session
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                log('❌ Non connecté. Veuillez vous connecter sur le dashboard d\'abord.', 'error');
+                return;
+            }
+            log('✅ Utilisateur connecté: ' + session.user.email, 'success');
+
+            // 2. Check Token Table
+            log('🔍 Vérification de la table `google_calendar_tokens`...', 'info');
+            const { data: tokenData, error: tokenError } = await supabase
+                .from('google_calendar_tokens')
+                .select('*')
+                .single();
+
+            if (tokenError) {
+                log('⚠️ Token introuvable ou table inexistante: ' + tokenError.message, 'warning');
+                log('👉 Action: Se connecter à Google Calendar via le Dashboard.', 'warning');
+            } else {
+                log('✅ Token Google trouvé pour cet utilisateur.', 'success');
+            }
+
+            // 3. Check Appointments Schema
+            log('🔍 Vérification de la colonne `google_event_id`...', 'info');
+            // Try to select the column. If it fails, it doesn't exist.
+            const { error: schemaError } = await supabase
+                .from('appointments')
+                .select('google_event_id')
+                .limit(1);
+
+            if (schemaError) {
+                log('❌ Colonne `google_event_id` manquante dans `appointments`.', 'error');
+                log('👉 Action: Exécuter le script SQL `setup_google_calendar.sql`', 'error');
+            } else {
+                log('✅ Colonne `google_event_id` existe.', 'success');
+            }
+
+            // 4. Test Edge Function
+            log('🔍 Test de l\'Edge Function `sync-google-calendar`...', 'info');
+            const functionUrl = 'https://uskjzczcuawhmrlwszpc.supabase.co/functions/v1/sync-google-calendar';
+
+            try {
+                // We intentionally send a bad payload to see if we get a logical error (function runs) or a 404/500 (function missing/crashed)
+                const res = await fetch(functionUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${session.access_token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ type: 'TEST_PING' })
+                });
+
+                if (res.status === 404) {
+                    log('❌ Edge Function INTROUVABLE (404).', 'error');
+                    log('👉 Action: Déployer la fonction `sync-google-calendar`.', 'error');
+                } else if (res.status === 200 || res.status === 500) {
+                    // 500 might happen if our ping payload breaks code logic, but it means the FUNCTION IS THERE.
+                    log(`✅ Edge Function détectée (Status ${res.status}).`, 'success');
+                    if (res.status === 200) {
+                        const json = await res.json();
+                        log('📦 Réponse: ' + JSON.stringify(json), 'info');
+                    }
+                } else {
+                    log(`⚠️ Statut réponse inattendu: ${res.status}`, 'warning');
+                }
+
+            } catch (e) {
+                log('❌ Erreur technique lors du test fonction: ' + e.message, 'error');
+            }
+        }
+
+        window.runDiagnostic = runDiagnostic;
+    </script>
+</head>
+
+<body>
+    <div class="card">
+        <h1>Diagnostic Synchro Google</h1>
+        <p>Ce script vérifie l'état de votre installation Supabase pour l'agenda.</p>
+        <button onclick="runDiagnostic()">Lancer l'analyse</button>
+    </div>
+    <div id="logs" class="card"></div>
+</body>
+
+</html>

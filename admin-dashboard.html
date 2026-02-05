@@ -303,6 +303,9 @@
                     💬 Messagerie <span id="nav-unread-badge"
                         style="background:#e74c3c; color:white; border-radius:10px; padding:2px 6px; font-size:0.7rem; display:none;">0</span>
                 </li>
+                <li class="nav-item" onclick="switchView('documents', this)">
+                    📄 Factures & Bons
+                </li>
             </ul>
         </aside>
 
@@ -332,6 +335,22 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Google Calendar Sync Status -->
+            <div
+                style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin: 20px 0; display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div style="font-size: 2rem;">📅</div>
+                    <div>
+                        <h4 style="margin: 0 0 5px 0;">Synchronisation Google Calendar</h4>
+                        <p id="calendar-sync-status" style="margin: 0; font-size: 0.9rem; color: #666;">Non connecté</p>
+                    </div>
+                </div>
+                <button id="connect-google-calendar-btn" onclick="connectGoogleCalendar()" class="btn btn-primary">
+                    Connecter Google Calendar
+                </button>
+            </div>
+
             <div
                 style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
                 <h3 style="margin-bottom: 20px; font-size: 1.2rem;">Dernières Inscriptions</h3>
@@ -350,7 +369,13 @@
 
         <!-- VIEW: CLIENTS -->
         <main id="view-clients" class="view-content">
-            <h2 style="margin-bottom: 30px;">Base de Données Clients</h2>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="margin: 0;">Base de Données Clients</h2>
+                <button onclick="loadClients()"
+                    style="padding: 10px 20px; background: var(--color-primary); color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: 500;">
+                    🔄 Rafraîchir
+                </button>
+            </div>
             <div
                 style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
                 <table class="client-table" id="all-clients-table">
@@ -436,7 +461,14 @@
         <main id="view-messages" class="view-content" style="padding: 0; display: none;">
             <div class="messaging-layout">
                 <div class="conversation-list" id="users-list">
-                    <div style="padding: 20px; text-align: center; color: #999;">Chargement...</div>
+                    <!-- Search Bar -->
+                    <div style="padding: 15px; border-bottom: 1px solid #eee; background: white;">
+                        <input type="text" id="client-search" placeholder="🔍 Rechercher un client..."
+                            style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 20px; font-size: 0.9rem;">
+                    </div>
+                    <div id="conversation-items">
+                        <div style="padding: 20px; text-align: center; color: #999;">Chargement...</div>
+                    </div>
                 </div>
                 <div style="display: flex; flex-direction: column; background: #fcfcfc;">
                     <div style="padding: 15px 25px; border-bottom: 1px solid #eee; background: white;">
@@ -455,25 +487,293 @@
                 </div>
             </div>
         </main>
+
+        <!-- VIEW: DOCUMENTS (Factures & Bons) -->
+        <main id="view-documents" class="view-content" style="display: none;">
+            <h2 style="margin-bottom: 30px;">Générateur de Documents</h2>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                <!-- Creator Form -->
+                <div
+                    style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+                    <h3 style="margin-bottom: 20px;">1. Créer le document</h3>
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 5px; font-weight: 500;">Type de document</label>
+                        <select id="doc-type" onchange="toggleDocFields()"
+                            style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                            <option value="invoice">Facture</option>
+                            <option value="gift">Bon Cadeau</option>
+                        </select>
+                    </div>
+
+                    <!-- Common Fields -->
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 5px; font-weight: 500;">Nom du Client</label>
+                        <input type="text" id="doc-client-name" placeholder="Ex: Jean Dupont"
+                            style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 5px; font-weight: 500;">Date</label>
+                        <input type="date" id="doc-date"
+                            style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                    </div>
+
+                    <!-- Invoice Specific -->
+                    <div id="invoice-fields">
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: 500;">Numéro de
+                                Facture</label>
+                            <input type="text" id="doc-number" placeholder="INV-2026-001"
+                                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: 500;">Prestation /
+                                Description</label>
+                            <input type="text" id="doc-desc" placeholder="Ex: Massage Ayurvédique"
+                                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: 500;">Montant (€)</label>
+                            <input type="number" id="doc-amount" placeholder="80"
+                                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                        </div>
+                    </div>
+
+                    <!-- Gift Card Specific -->
+                    <div id="gift-fields" style="display: none;">
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: 500;">De la part de</label>
+                            <input type="text" id="doc-from" placeholder="Ex: Marie"
+                                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: 500;">Valeur / Soin
+                                Offert</label>
+                            <input type="text" id="doc-gift-value" placeholder="Ex: 80€ ou Massage Prénatal"
+                                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: 500;">Message
+                                personnel</label>
+                            <textarea id="doc-message" rows="3"
+                                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></textarea>
+                        </div>
+                    </div>
+
+                    <button onclick="generatePreview()" class="btn btn-primary"
+                        style="width: 100%; margin-top: 10px;">Prévisualiser</button>
+                </div>
+
+                <!-- Preview & Action -->
+                <div>
+                    <h3 style="margin-bottom: 20px;">2. Prévisualisation & Export</h3>
+                    <div id="doc-preview-box"
+                        style="border: 1px solid #ddd; padding: 20px; background: #fff; min-height: 400px; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-radius: 8px;">
+                        <p style="text-align: center; color: #999; margin-top: 150px;">Aperçu du document ici</p>
+                    </div>
+                    <div style="display: flex; gap: 10px; margin-top: 20px;">
+                        <button onclick="downloadPDF()" class="btn btn-primary">📥 Télécharger PDF</button>
+                        <a id="mail-link" href="#" class="btn btn-secondary"
+                            style="text-decoration: none; display: flex; align-items: center; justify-content: center;">📧
+                            Préparer Email</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hidden Templates -->
+            <div style="display: none;">
+                <!-- INVOICE TEMPLATE -->
+                <div id="tpl-invoice"
+                    style="width: 100%; max-width: 800px; margin: 0 auto; padding: 40px; background: white; color: #333; font-family: 'Montserrat', sans-serif;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--color-primary); padding-bottom: 20px; margin-bottom: 30px;">
+                        <img src="Gemini_Generated_Image_36tfxk36tfxk36tf-removebg-preview.png" style="height: 80px;">
+                        <div style="text-align: right;">
+                            <h1 style="color: var(--color-primary-dark); margin: 0;">FACTURE</h1>
+                            <p style="margin: 5px 0 0; color: #666;" id="tpl-inv-number">#</p>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 40px;">
+                        <div>
+                            <strong>Émetteur:</strong><br>
+                            Moments d'Évasion<br>
+                            7 Ter Rue des Sables<br>
+                            86360 MONTAMISÉ<br>
+                            SIRET: 829 717 636 00015
+                        </div>
+                        <div style="text-align: right;">
+                            <strong>Client:</strong><br>
+                            <span id="tpl-inv-client">Nom Client</span><br>
+                            Date: <span id="tpl-inv-date">01/01/2026</span>
+                        </div>
+                    </div>
+
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
+                        <thead>
+                            <tr style="background: #f9f9f9; text-align: left;">
+                                <th style="padding: 10px; border-bottom: 1px solid #ddd;">Description</th>
+                                <th style="padding: 10px; border-bottom: 1px solid #ddd; text-align: right;">Montant
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 10px; border-bottom: 1px solid #eee;" id="tpl-inv-desc">Service</td>
+                                <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;"
+                                    id="tpl-inv-amount">0€</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div style="text-align: right; margin-top: 20px;">
+                        <h3 style="color: var(--color-primary-dark);">Total: <span id="tpl-inv-total">0€</span></h3>
+                        <p style="font-size: 0.8rem; color: #999;">TVA non applicable, art. 293 B du CGI</p>
+                    </div>
+
+                    <div style="margin-top: 50px; text-align: center; font-size: 0.9rem; color: #666;">
+                        <p>Merci de votre confiance !</p>
+                    </div>
+                </div>
+
+                <!-- GIFT CARD TEMPLATE -->
+                <div id="tpl-gift"
+                    style="width: 100%; max-width: 800px; margin: 0 auto; padding: 40px; background: linear-gradient(135deg, #fff 0%, #fdfbf7 100%); color: #333; font-family: 'Montserrat', sans-serif; border: 2px solid var(--color-accent); border-radius: 15px; text-align: center; position: relative; overflow: hidden;">
+                    <div
+                        style="content: '🎁'; position: absolute; font-size: 200px; opacity: 0.05; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                        🎁</div>
+                    <img src="Gemini_Generated_Image_36tfxk36tfxk36tf-removebg-preview.png"
+                        style="height: 100px; margin-bottom: 20px; position: relative; z-index: 1;">
+                    <h1
+                        style="color: var(--color-primary-dark); font-family: 'Cormorant Garamond'; letter-spacing: 2px; position: relative; z-index: 1;">
+                        BON CADEAU</h1>
+
+                    <div style="margin: 30px 0; font-size: 1.2rem; position: relative; z-index: 1;">
+                        <p>Pour : <strong id="tpl-gift-to"
+                                style="color: var(--color-accent); font-size: 1.4rem;">Client</strong></p>
+                        <p>De la part de : <strong id="tpl-gift-from">Ami</strong></p>
+                    </div>
+
+                    <div
+                        style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); display: inline-block; margin-bottom: 30px; border: 1px dashed var(--color-primary); position: relative; z-index: 1;">
+                        <h2 style="margin: 0; color: var(--color-primary-dark);" id="tpl-gift-value">Soin Offert</h2>
+                    </div>
+
+                    <p id="tpl-gift-msg"
+                        style="font-style: italic; color: #666; margin-bottom: 40px; white-space: pre-wrap; position: relative; z-index: 1;">
+                        Message...</p>
+
+                    <div style="font-size: 0.8rem; color: #999; position: relative; z-index: 1;">
+                        Valable 6 mois à partir du <span id="tpl-gift-date">Date</span><br>
+                        Moments d'Évasion - Montamisé - 06 31 85 68 31
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
 
+    <!-- html2pdf library for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
     <!-- Logic -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0"></script>
     <script type="module">
         import { supabase } from './js/config.js';
 
         let activeUserId = null;
         let currentUser = null;
 
+        // Document Generator Functions (Restored)
+        window.toggleDocFields = () => {
+            const type = document.getElementById('doc-type');
+            if (type && type.value === 'invoice') {
+                document.getElementById('invoice-fields').style.display = 'block';
+                document.getElementById('gift-fields').style.display = 'none';
+            } else if (type) {
+                document.getElementById('invoice-fields').style.display = 'none';
+                document.getElementById('gift-fields').style.display = 'block';
+            }
+        };
+
+        window.generatePreview = () => {
+            const type = document.getElementById('doc-type');
+            const previewBox = document.getElementById('doc-preview-box');
+            if (!type || !previewBox) return;
+
+            const clientName = document.getElementById('doc-client-name').value || 'Client';
+            const dateInput = document.getElementById('doc-date');
+            const dateStr = dateInput ? new Date(dateInput.value).toLocaleDateString() : '';
+
+            previewBox.innerHTML = '';
+            let templateClone;
+
+            if (type.value === 'invoice') {
+                const tpl = document.getElementById('tpl-invoice');
+                if (!tpl) return;
+                templateClone = tpl.cloneNode(true);
+                templateClone.classList.add('visible');
+
+                templateClone.querySelector('#tpl-inv-number').innerText = document.getElementById('doc-number').value || 'INV-001';
+                templateClone.querySelector('#tpl-inv-client').innerText = clientName;
+                templateClone.querySelector('#tpl-inv-date').innerText = dateStr;
+                templateClone.querySelector('#tpl-inv-desc').innerText = document.getElementById('doc-desc').value || 'Prestation';
+                
+                const amountEl = document.getElementById('doc-amount');
+                const amount = amountEl ? amountEl.value : 0;
+                templateClone.querySelector('#tpl-inv-amount').innerText = amount + '€';
+                templateClone.querySelector('#tpl-inv-total').innerText = amount + '€';
+
+            } else {
+                const tpl = document.getElementById('tpl-gift');
+                if (!tpl) return;
+                templateClone = tpl.cloneNode(true);
+                templateClone.classList.add('visible');
+
+                templateClone.querySelector('#tpl-gift-to').innerText = clientName;
+                templateClone.querySelector('#tpl-gift-from').innerText = document.getElementById('doc-from').value || '';
+                templateClone.querySelector('#tpl-gift-value').innerText = document.getElementById('doc-gift-value').value || 'Bon Cadeau';
+                templateClone.querySelector('#tpl-gift-msg').innerText = document.getElementById('doc-message').value || '';
+                templateClone.querySelector('#tpl-gift-date').innerText = dateStr;
+            }
+            
+            previewBox.appendChild(templateClone);
+
+            const mailSubject = type.value === 'invoice' ? `Facture - Moments d'Évasion` : `Votre Bon Cadeau - Moments d'Évasion`;
+            const mailBody = `Bonjour ${clientName},\n\nVeuillez trouver ci-joint votre document.\n\nCordialement,\nMichèle\nMoments d'Évasion`;
+            const mailLink = document.getElementById('mail-link');
+            if (mailLink) mailLink.href = `mailto:?subject=${encodeURIComponent(mailSubject)}&body=${encodeURIComponent(mailBody)}`;
+        };
+
+        window.downloadPDF = () => {
+             const previewBox = document.getElementById('doc-preview-box');
+             if (!previewBox) return;
+             const element = previewBox.firstElementChild;
+             if (!element) { alert('Veuillez d\'abord prévisualiser le document.'); return; }
+             const type = document.getElementById('doc-type').value;
+             const clientName = document.getElementById('doc-client-name').value || 'Client';
+             const opt = {
+                 margin: 10,
+                 filename: `${type}_${clientName}.pdf`,
+                 image: { type: 'jpeg', quality: 0.98 },
+                 html2canvas: { scale: 2 },
+                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+             };
+             html2pdf().set(opt).from(element).save();
+        };
+
         window.switchView = (viewName, el) => {
+            console.log('🔵 switchView called:', viewName);
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-            el.classList.add('active');
+            if (el) el.classList.add('active');
 
             document.querySelectorAll('.view-content').forEach(content => content.classList.remove('active'));
             document.getElementById('view-overview').style.display = 'none';
             document.getElementById('view-clients').style.display = 'none';
             document.getElementById('view-calendar').style.display = 'none';
             document.getElementById('view-messages').style.display = 'none';
+            if (document.getElementById('view-documents')) {
+                document.getElementById('view-documents').style.display = 'none';
+            }
 
             document.getElementById(`view-${viewName}`).style.display = 'block';
 
@@ -482,98 +782,125 @@
             if (viewName === 'overview') loadOverviewStats();
         };
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (!session) { window.location.href = 'login.html'; return; }
-            currentUser = session.user;
+        // LEGACY INSTANT LOADING LOGIC
+        // Utilise onAuthStateChange pour la sécurité, mais sans bloquer l'UI
+        supabase.auth.onAuthStateChange(async (event, session) => {
+            console.log('🟡 Auth event:', event);
+            if (!session) {
+                window.location.href = 'login.html';
+                return;
+            }
 
+            currentUser = session.user;
+            console.log('✅ User authenticated');
+
+            // Affichage IMMÉDIAT du dashboard
+            const overview = document.getElementById('view-overview');
+            if (overview && !overview.classList.contains('active')) {
+                // Si aucune vue active, activer overview
+                if (!document.querySelector('.view-content.active')) {
+                    overview.style.display = 'block';
+                    overview.classList.add('active');
+                }
+            }
+
+            // Chargement des données en arrière-plan (FIRE AND FORGET)
+            console.log('🚀 Triggering async data loads...');
             loadOverviewStats();
             loadClients();
-            document.getElementById('view-overview').style.display = 'block';
+            if (typeof checkCalendarSyncStatus === 'function') checkCalendarSyncStatus();
         });
 
         /* --- CALENDAR LOGIC --- */
         async function renderCalendarView() {
-            const now = new Date();
-            const monthNames = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
-            document.getElementById('calendar-month-title').innerText = `${monthNames[now.getMonth()]} ${now.getFullYear()}`;
+            try {
+                const now = new Date();
+                const monthNames = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
+                document.getElementById('calendar-month-title').innerText = `${monthNames[now.getMonth()]} ${now.getFullYear()}`;
 
-            // Fetch ALL appointments for current month & next few days
-            // Simplification: Fetch all future and recent past 
-            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-            const { data: apts } = await supabase
-                .from('appointments')
-                .select(`*, profiles:client_id(full_name)`)
-                .gte('start_time', startOfMonth)
-                .order('start_time');
+                // Fetch ALL appointments for current month & next few days
+                console.log('📅 Loading calendar events...');
+                const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+                const { data: apts, error } = await supabase
+                    .from('appointments')
+                    .select(`*, profiles:client_id(full_name)`)
+                    .gte('start_time', startOfMonth)
+                    .order('start_time');
 
-            // 1. Next 48h
-            const upcomingContainer = document.getElementById('upcoming-list');
-            const in48h = new Date(now.getTime() + 48 * 60 * 60 * 1000);
+                if (error) throw error;
 
-            const immediateApts = apts.filter(a => {
-                const d = new Date(a.start_time);
-                return d >= now && d <= in48h;
-            });
+                // 1. Next 48h
+                const upcomingContainer = document.getElementById('upcoming-list');
+                const in48h = new Date(now.getTime() + 48 * 60 * 60 * 1000);
 
-            if (immediateApts.length === 0) {
-                upcomingContainer.innerHTML = '<div style="color:#666; padding:10px;">Aucun rendez-vous dans les 48h.</div>';
-            } else {
-                upcomingContainer.innerHTML = immediateApts.map(a => {
+                const immediateApts = (apts || []).filter(a => {
                     const d = new Date(a.start_time);
-                    const name = a.client_name || a.profiles?.full_name || 'Inconnu';
-                    return `
-                        <div class="appointment-card">
-                            <div style="font-weight:600; color:var(--color-primary-dark);">${d.toLocaleDateString()} à ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
-                            <div style="font-size:1.1rem; margin:5px 0;">${name}</div>
-                            <div style="font-size:0.9rem; color:#666;">${a.notes || ''}</div>
-                        </div>
-                    `;
-                }).join('');
-            }
-
-            // 2. Month Grid
-            const grid = document.getElementById('calendar-grid');
-            grid.innerHTML = '';
-
-            // Days header
-            ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'].forEach(d => {
-                grid.innerHTML += `<div class="calendar-day-header">${d}</div>`;
-            });
-
-            const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
-            const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-            const daysInMonth = lastDay.getDate();
-            const startDayIndex = firstDay.getDay(); // 0 = Sunday
-
-            // Empty slots
-            for (let i = 0; i < startDayIndex; i++) {
-                grid.innerHTML += `<div style="background:transparent;"></div>`;
-            }
-
-            // Days
-            for (let i = 1; i <= daysInMonth; i++) {
-                const dayDate = new Date(now.getFullYear(), now.getMonth(), i);
-                const isToday = i === now.getDate();
-
-                // Count apts for this day
-                const dayApts = apts.filter(a => {
-                    const d = new Date(a.start_time);
-                    return d.getDate() === i && d.getMonth() === now.getMonth();
+                    return d >= now && d <= in48h;
                 });
 
-                let content = `<span class="day-number">${i}</span>`;
-                if (dayApts.length > 0) {
-                    content += `<span class="day-event-count">${dayApts.length} RDV</span>`;
+                if (immediateApts.length === 0) {
+                    upcomingContainer.innerHTML = '<div style="color:#666; padding:10px;">Aucun rendez-vous dans les 48h.</div>';
                 } else {
-                    content += `<span style="display:block; margin-top:5px; color:#ddd; font-size:0.8rem;">Rien</span>`;
+                    upcomingContainer.innerHTML = immediateApts.map(a => {
+                        const d = new Date(a.start_time);
+                        const name = a.client_name || a.profiles?.full_name || 'Inconnu';
+                        return `
+                            <div class="appointment-card">
+                                <div style="font-weight:600; color:var(--color-primary-dark);">${d.toLocaleDateString()} à ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                                <div style="font-size:1.1rem; margin:5px 0;">${name}</div>
+                                <div style="font-size:0.9rem; color:#666;">${a.notes || ''}</div>
+                            </div>
+                        `;
+                    }).join('');
                 }
 
-                grid.innerHTML += `
-                    <div class="calendar-day ${isToday ? 'today' : ''}">
-                        ${content}
-                    </div>
-                `;
+                // 2. Month Grid
+                const grid = document.getElementById('calendar-grid');
+                grid.innerHTML = '';
+
+                // Days header
+                ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'].forEach(d => {
+                    grid.innerHTML += `<div class="calendar-day-header">${d}</div>`;
+                });
+
+                const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+                const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+                const daysInMonth = lastDay.getDate();
+                const startDayIndex = firstDay.getDay(); // 0 = Sunday
+
+                // Empty slots
+                for (let i = 0; i < startDayIndex; i++) {
+                    grid.innerHTML += `<div style="background:transparent;"></div>`;
+                }
+
+                // Days
+                for (let i = 1; i <= daysInMonth; i++) {
+                    const dayDate = new Date(now.getFullYear(), now.getMonth(), i);
+                    const isToday = i === now.getDate();
+
+                    // Count apts for this day
+                    const dayApts = (apts || []).filter(a => {
+                        const d = new Date(a.start_time);
+                        return d.getDate() === i && d.getMonth() === now.getMonth();
+                    });
+
+                    let content = `<span class="day-number">${i}</span>`;
+                    if (dayApts.length > 0) {
+                        content += `<span class="day-event-count">${dayApts.length} RDV</span>`;
+                    } else {
+                        content += `<span style="display:block; margin-top:5px; color:#ddd; font-size:0.8rem;">-</span>`;
+                    }
+
+                    grid.innerHTML += `
+                        <div class="calendar-day ${isToday ? 'today' : ''}">
+                            ${content}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error rendering calendar:', error);
+                document.getElementById('upcoming-list').innerHTML = '<div style="color:red; padding:10px;">Erreur chargement agenda</div>';
+                document.getElementById('calendar-grid').innerHTML = '<div style="color:red; padding:10px;">Erreur - Voir console</div>';
             }
         }
 
@@ -599,27 +926,62 @@
         });
 
         /* --- MESSAGING & NOTIFICATIONS --- */
-        async function loadConversations() {
-            const container = document.getElementById('users-list');
-            const { data: msgs } = await supabase.from('messages').select('user_id, content, created_at, read, is_admin_reply').order('created_at', { ascending: false });
-            if (!msgs) return;
+        let allConversations = []; // Store all conversations for filtering
 
-            const conversations = {};
-            msgs.forEach(m => {
-                if (!conversations[m.user_id]) conversations[m.user_id] = { last_message: m, unread_count: 0 };
-                if (!m.read && !m.is_admin_reply) conversations[m.user_id].unread_count++;
-            });
-            const userIds = Object.keys(conversations);
-            let profilesMap = {};
-            if (userIds.length > 0) {
-                const { data: p } = await supabase.from('profiles').select('id,full_name,email').in('id', userIds);
-                p?.forEach(x => profilesMap[x.id] = x);
+        async function loadConversations() {
+            const container = document.getElementById('conversation-items');
+            try {
+                console.log('💬 Loading conversations...');
+                const { data: msgs, error } = await supabase
+                    .from('messages')
+                    .select('user_id, content, created_at, read, is_admin_reply')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+                if (!msgs) {
+                    container.innerHTML = '<div style="padding: 20px; text-align: center; color: #999;">Aucun message accessible.</div>';
+                    return;
+                }
+
+                const conversations = {};
+                msgs.forEach(m => {
+                    if (!conversations[m.user_id]) conversations[m.user_id] = { last_message: m, unread_count: 0 };
+                    // Count only CLIENT messages that are unread
+                    if (!m.read && !m.is_admin_reply) conversations[m.user_id].unread_count++;
+                });
+
+                const userIds = Object.keys(conversations);
+                let profilesMap = {};
+                if (userIds.length > 0) {
+                    const { data: p } = await supabase.from('profiles').select('id,full_name,email').in('id', userIds);
+                    p?.forEach(x => profilesMap[x.id] = x);
+                }
+
+                // Store for search filtering
+                allConversations = userIds.map(uid => ({
+                    id: uid,
+                    profile: profilesMap[uid] || { full_name: 'Inconnu', email: '...' },
+                    conv: conversations[uid]
+                }));
+
+                renderConversations(allConversations);
+                updateBadgeCounts(); // Update all badges after loading
+
+            } catch (error) {
+                console.error('Error loading conversations:', error);
+                container.innerHTML = '<div style="color:red; padding:20px;">Erreur chargement messages</div>';
+            }
+        }
+
+        function renderConversations(conversationsToShow) {
+            const container = document.getElementById('conversation-items');
+            if (!conversationsToShow || conversationsToShow.length === 0) {
+                container.innerHTML = '<div style="padding: 20px; text-align: center; color: #999;">Aucune conversation</div>';
+                return;
             }
 
             container.innerHTML = '';
-            userIds.forEach(uid => {
-                const profile = profilesMap[uid] || { full_name: 'Inconnu', email: '...' };
-                const conv = conversations[uid];
+            conversationsToShow.forEach(({ id, profile, conv }) => {
                 const isUnread = conv.unread_count > 0;
 
                 const div = document.createElement('div');
@@ -628,9 +990,35 @@
                     <div style="font-weight: 600; margin-bottom: 5px;">${profile.full_name || profile.email} ${isUnread ? `<span style="color: #e74c3c">(${conv.unread_count})</span>` : ''}</div>
                     <div style="font-size: 0.85rem; color: #666; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">${conv.last_message.content}</div>
                 `;
-                div.onclick = () => openChat(uid, profile);
+                div.onclick = () => openChat(id, profile);
                 container.appendChild(div);
             });
+        }
+
+        // Search functionality
+        function setupSearchListener() {
+            const searchInput = document.getElementById('client-search');
+            if (searchInput) {
+                // Remove existing listeners to avoid duplicates if called multiple times (though replaceElement is better)
+                const newClone = searchInput.cloneNode(true);
+                searchInput.parentNode.replaceChild(newClone, searchInput);
+
+                newClone.addEventListener('input', (e) => {
+                    const query = e.target.value.toLowerCase();
+                    if (!query) {
+                        renderConversations(allConversations);
+                        return;
+                    }
+
+                    const filtered = allConversations.filter(({ profile }) => {
+                        const name = (profile.full_name || '').toLowerCase();
+                        const email = (profile.email || '').toLowerCase();
+                        return name.includes(query) || email.includes(query);
+                    });
+
+                    renderConversations(filtered);
+                });
+            }
         }
 
         async function openChat(userId, profile) {
@@ -638,13 +1026,36 @@
             document.getElementById('current-chat-user').innerText = profile.full_name || profile.email;
             document.getElementById('admin-reply-form').style.display = 'flex';
 
-            // 1. UPDATE DB
-            await supabase.from('messages').update({ read: true }).eq('user_id', userId).eq('is_admin_reply', false);
+            console.log('📖 Opening chat for user:', userId);
 
-            // 2. DISPATCH EVENT (Fix for Notification Badge)
-            window.dispatchEvent(new CustomEvent('messages-read'));
+            // DEBUG: Check what messages exist BEFORE update
+            const { data: beforeMessages } = await supabase
+                .from('messages')
+                .select('id, content, read, is_admin_reply')
+                .eq('user_id', userId);
 
-            // 3. Load UI
+            console.log('🔍 All messages for this user:', beforeMessages);
+            const unreadClientMsgs = beforeMessages?.filter(m => m.read === false && m.is_admin_reply === false);
+            console.log('🔍 Unread CLIENT messages that SHOULD be marked:', unreadClientMsgs?.length, unreadClientMsgs);
+
+            // Mark ALL messages from this user as read
+            const { error } = await supabase
+                .from('messages')
+                .update({ read: true })
+                .eq('user_id', userId)
+                .eq('is_admin_reply', false);
+
+            if (error) {
+                console.error('Error marking messages as read:', error);
+            }
+
+            // Update UI immediately
+            await updateBadgeCounts();
+
+            // Refresh conversation list to remove unread indicator
+            await loadConversations();
+
+            // Load chat messages
             const chatContainer = document.getElementById('admin-chat-area');
             chatContainer.innerHTML = 'Chargement...';
             const { data } = await supabase.from('messages').select('*').eq('user_id', userId).order('created_at', { ascending: true });
@@ -657,6 +1068,35 @@
                 chatContainer.appendChild(div);
             });
             chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        // Unified badge update function
+        async function updateBadgeCounts() {
+            const { count: unreadCount } = await supabase
+                .from('messages')
+                .select('*', { count: 'exact', head: true })
+                .eq('read', false)
+                .eq('is_admin_reply', false);
+
+            // Update navbar badge
+            const navBadge = document.getElementById('nav-unread-badge');
+            if (navBadge) {
+                if (unreadCount > 0) {
+                    navBadge.innerText = unreadCount;
+                    navBadge.style.display = 'inline-block';
+                } else {
+                    navBadge.style.display = 'none';
+                }
+            }
+
+            // Update stats if on overview
+            const statBadge = document.getElementById('stat-unread-messages');
+            if (statBadge) {
+                statBadge.innerText = unreadCount || 0;
+            }
+
+            // Dispatch event for auth.js badge
+            window.dispatchEvent(new CustomEvent('messages-read'));
         }
 
         document.getElementById('admin-reply-form').addEventListener('submit', async (e) => {
@@ -677,28 +1117,166 @@
 
         /* --- STATS STUB for view switching --- */
         async function loadOverviewStats() {
-            // Re-implement basic calls (same as before)
-            const { count: clientCount } = await supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'client');
-            document.getElementById('stat-total-clients').innerText = clientCount || 0;
-            const { count: unreadCount } = await supabase.from('messages').select('*', { count: 'exact', head: true }).eq('read', false).eq('is_admin_reply', false);
-            document.getElementById('stat-unread-messages').innerText = unreadCount || 0;
-            const { count: aptCount } = await supabase.from('appointments').select('*', { count: 'exact', head: true }).gte('start_time', new Date().toISOString());
-            document.getElementById('stat-upcoming-apts').innerText = aptCount || 0;
+            console.log('📊 loadOverviewStats START');
+            try {
+                // 1. Clients Count
+                try {
+                    const { count: clientCount } = await supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'client');
+                    document.getElementById('stat-total-clients').innerText = clientCount || 0;
+                } catch (e) { console.error('Stats clients error', e); }
 
-            // Update nav badge too
-            const b = document.getElementById('nav-unread-badge');
-            if (unreadCount > 0) { b.innerText = unreadCount; b.style.display = 'inline-block'; } else b.style.display = 'none';
+                // 2. Unread Messages
+                try {
+                    const { count: unreadCount } = await supabase.from('messages').select('*', { count: 'exact', head: true }).eq('read', false).eq('is_admin_reply', false);
+                    document.getElementById('stat-unread-messages').innerText = unreadCount || 0;
+                    // Badge
+                    const b = document.getElementById('nav-unread-badge');
+                    if (b) {
+                        if (unreadCount > 0) { b.innerText = unreadCount; b.style.display = 'inline-block'; }
+                        else b.style.display = 'none';
+                    }
+                } catch (e) { console.error('Stats messages error', e); }
 
-            const { data: recent } = await supabase.from('profiles').select('*').order('created_at', { ascending: false }).limit(5);
-            if (recent) {
-                document.querySelector('#recent-users-table tbody').innerHTML = recent.map(u => `<tr><td>${u.full_name || '-'}</td><td>${u.email}</td><td>${new Date(u.created_at).toLocaleDateString()}</td></tr>`).join('');
+                // 3. Upcoming Appointments
+                try {
+                    const { count: aptCount } = await supabase.from('appointments').select('*', { count: 'exact', head: true }).gte('start_time', new Date().toISOString());
+                    document.getElementById('stat-upcoming-apts').innerText = aptCount || 0;
+                } catch (e) { console.error('Stats apts error', e); }
+
+                // 4. Recent Users
+                console.log('  ↳ Fetching recent users...');
+                const { data: recent, error: err3 } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(5);
+
+                if (err3) throw err3;
+                console.log('  ✅ Recent users:', recent?.length || 0);
+
+                const recentTable = document.querySelector('#recent-users-table tbody');
+                if (recentTable) {
+                    if (recent && recent.length > 0) {
+                        recentTable.innerHTML = recent.map(u =>
+                            `<tr>
+                                <td>${u.full_name || 'Inconnu'}</td>
+                                <td>${u.email}</td>
+                                <td>${new Date(u.created_at).toLocaleDateString()}</td>
+                            </tr>`
+                        ).join('');
+                    } else {
+                        recentTable.innerHTML = '<tr><td colspan="3" style="text-align:center">Aucun client récent</td></tr>';
+                    }
+                }
+
+                console.log('✅ loadOverviewStats COMPLETE');
+
+            } catch (error) {
+                console.error('❌ Error in loadOverviewStats:', error);
             }
         }
 
         async function loadClients() {
-            const { data: c } = await supabase.from('profiles').select('*').order('created_at', { ascending: false });
-            if (c) document.getElementById('clients-table-body').innerHTML = c.map(u => `<tr><td><strong>${u.full_name || '-'}</strong></td><td>${u.email}</td><td>${u.role}</td><td>${new Date(u.created_at).toLocaleDateString()}</td></tr>`).join('');
+            try {
+                const { data: c, error } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                if (c && c.length > 0) {
+                    document.getElementById('clients-table-body').innerHTML = c.map(u =>
+                        `<tr>
+                            <td><strong>${u.full_name || '-'}</strong></td>
+                            <td>${u.email}</td>
+                            <td>${u.role || 'client'}</td>
+                            <td>${new Date(u.created_at).toLocaleDateString()}</td>
+                        </tr>`
+                    ).join('');
+                } else {
+                    document.getElementById('clients-table-body').innerHTML = '<tr><td colspan="4" style="text-align:center">Aucun client trouvé</td></tr>';
+                }
+            } catch (error) {
+                console.error('Error loading clients:', error);
+                document.getElementById('clients-table-body').innerHTML = '<tr><td colspan="4" style="text-align:center; color:red">Erreur de chargement</td></tr>';
+            }
         }
+
+        // Expose for onclick
+        window.loadClients = loadClients;
+
+        /* --- GOOGLE CALENDAR SYNC --- */
+        async function checkCalendarSyncStatus() {
+            const { data: tokenData } = await supabase
+                .from('google_calendar_tokens')
+                .select('*')
+                .maybeSingle();
+
+            const statusEl = document.getElementById('calendar-sync-status');
+            const btnEl = document.getElementById('connect-google-calendar-btn');
+
+            if (statusEl && btnEl) {
+                if (tokenData) {
+                    statusEl.textContent = '✅ Connecté - Les RDV sont automatiquement synchronisés';
+                    statusEl.style.color = '#27ae60';
+                    btnEl.textContent = 'Reconnecter';
+                } else {
+                    statusEl.textContent = '❌ Non connecté - Cliquez pour activer la synchronisation';
+                    statusEl.style.color = '#e74c3c';
+                }
+            }
+        }
+
+        async function connectGoogleCalendar() {
+            try {
+                const { data, error } = await supabase.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: {
+                        scopes: 'https://www.googleapis.com/auth/calendar.events',
+                        redirectTo: window.location.href,
+                        queryParams: {
+                            access_type: 'offline',
+                            prompt: 'consent'
+                        }
+                    }
+                });
+
+                if (error) throw error;
+            } catch (error) {
+                console.error('Calendar connection error:', error);
+                alert('Erreur lors de la connexion à Google Calendar: ' + error.message);
+            }
+        }
+
+        // Sauvegarder le refresh token après OAuth
+        supabase.auth.onAuthStateChange(async (event, session) => {
+            if (event === 'SIGNED_IN' && session?.provider_token && session?.provider_refresh_token) {
+                const { error } = await supabase
+                    .from('google_calendar_tokens')
+                    .upsert({
+                        user_id: session.user.id,
+                        refresh_token: session.provider_refresh_token,
+                        access_token: session.provider_token,
+                        token_expires_at: new Date(Date.now() + 3600 * 1000).toISOString()
+                    });
+
+                if (!error) {
+                    await checkCalendarSyncStatus();
+                }
+            }
+        });
+
+        // Make connectGoogleCalendar globally accessible
+        window.connectGoogleCalendar = connectGoogleCalendar;
+
+
+
+        // Initial load - DISABLED: using getSession callback instead (line 797-803)
+        // document.addEventListener('DOMContentLoaded', async () => {
+        //     switchView('overview');
+        //     await checkCalendarSyncStatus();
+        // });
     </script>
 </body>
 

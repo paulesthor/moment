@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Test Supabase</title>
+</head>
+
+<body>
+    <h1>Test de Connexion Supabase</h1>
+    <button id="testBtn">Tester la connexion API</button>
+    <pre id="result" style="background: #f4f4f4; padding: 20px; margin-top: 20px;"></pre>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0"></script>
+    <script type="module">
+        const SUPABASE_URL = 'https://uskjzczcuawhmrlwszpc.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVza2p6Y3pjdWF3aG1ybHdzenBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyMTE4NzgsImV4cCI6MjA4NTc4Nzg3OH0.ombvKQ-6hRU746rj7i-EsCFc5P-54EzkGVvln5vu5GM';
+
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const result = document.getElementById('result');
+
+        document.getElementById('testBtn').addEventListener('click', async () => {
+            result.textContent = '⏳ Test en cours...\n\n';
+
+            try {
+                // Test 1: Connexion de base
+                result.textContent += '1️⃣ Test client Supabase: ';
+                result.textContent += supabase ? '✅ Client créé\n' : '❌ ÉCHEC\n';
+
+                // Test 2: Requête profiles (SELECT * LIMIT 5)
+                result.textContent += '\n2️⃣ Test requête API (profiles limit 5)...\n';
+
+                const startTime = Date.now();
+                const timeoutPromise = new Promise((_, reject) =>
+                    setTimeout(() => reject(new Error('TIMEOUT après 5s')), 5000)
+                );
+
+                const { data, error } = await Promise.race([
+                    supabase
+                        .from('profiles')
+                        .select('*')
+                        .order('created_at', { ascending: false })
+                        .limit(5),
+                    timeoutPromise
+                ]);
+
+                const duration = Date.now() - startTime;
+
+                if (error) {
+                    result.textContent += `❌ ERREUR: ${error.message}\n`;
+                } else {
+                    result.textContent += `✅ Succès ! ${data.length} profils trouvés\n`;
+                    result.textContent += `⏱️ Durée: ${duration}ms\n`;
+                    result.textContent += JSON.stringify(data, null, 2);
+                }
+
+            } catch (err) {
+                result.textContent += `❌ EXCEPTION: ${err.message}\n`;
+            }
+        });
+    </script>
+</body>
+
+</html>

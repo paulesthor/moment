@@ -14,14 +14,59 @@ async function initAuth() {
     }
 
     // Listen for auth changes
-    supabase.auth.onAuthStateChange((_event, session) => {
+    supabase.auth.onAuthStateChange(async (_event, session) => {
         if (session) {
+            // For OAuth users, ensure profile exists
+            if (_event === 'SIGNED_IN' || _event === 'INITIAL_SESSION') {
+                await ensureProfileExists(session.user);
+            }
             checkUserRole(session.user);
         } else {
             document.body.classList.remove('is-admin');
             removeUserMenu();
         }
     });
+}
+
+// Ensure profile exists for OAuth users
+async function ensureProfileExists(user) {
+    try {
+        // Small delay to let session stabilize (OAuth issue workaround)
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        const { data: existingProfile, error: fetchError } = await supabase
+            .from('profiles')
+            .select('id')
+            .eq('id', user.id)
+            .maybeSingle();
+
+        // If fetch failed, log but don't crash - profile might exist or will be created by trigger
+        if (fetchError) {
+            console.warn('Profile check warning (non-critical):', fetchError.message);
+            return;
+        }
+
+        if (!existingProfile) {
+            // Create profile for OAuth user
+            const { error } = await supabase
+                .from('profiles')
+                .insert({
+                    id: user.id,
+                    email: user.email,
+                    full_name: user.user_metadata?.full_name || user.user_metadata?.name || 'Utilisateur',
+                    role: 'client'
+                });
+
+            if (error) {
+                console.error('Error creating OAuth profile:', error);
+            } else {
+                console.log('Profile created for OAuth user');
+            }
+        }
+    } catch (error) {
+        console.error('Error ensuring profile:', error);
+        // Don't throw - let auth continue even if profile check fails
+    }
 }
 
 async function checkUserRole(user) {
