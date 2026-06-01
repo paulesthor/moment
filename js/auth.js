@@ -149,7 +149,7 @@ function createUserMenu(user) {
     `;
 
     // Insert before the Rendez-vous CTA (last item), not after
-    const ctaItem = navMenu.querySelector('li:has(.nav-cta)');
+    const ctaItem = Array.from(navMenu.querySelectorAll('li')).find(li => li.querySelector('.nav-cta'));
     if (ctaItem) {
         navMenu.insertBefore(userLi, ctaItem);
     } else {
