@@ -1,0 +1,5 @@
+ancienne version/
+*.log
+.DS_Store
+Thumbs.db
+desktop.ini

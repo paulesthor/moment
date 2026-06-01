@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Témoignages clients Moments d'Évasion — Découvrez les avis de nos clients satisfaits.">
+  <title>Témoignages | Moments d'Évasion</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=block" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* ---- Testimonials redesign: editorial flow, no rigid boxes ---- */
+    .testi-section { background: var(--warm-white); }
+
+    .testi-flow {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--s6) var(--s5);
+      margin-top: var(--s8);
+    }
+    @media (max-width: 900px) { .testi-flow { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 560px) { .testi-flow { grid-template-columns: 1fr; } }
+
+    .tq {
+      display: flex;
+      flex-direction: column;
+      gap: var(--s3);
+      padding: var(--s5);
+      border-radius: 16px;
+      background: transparent;
+      position: relative;
+      transition: background 200ms ease;
+    }
+    .tq:hover { background: var(--sage-50, #f6f8f4); }
+
+    .tq-mark {
+      font-family: Georgia, serif;
+      font-size: 4rem;
+      line-height: 1;
+      color: var(--gold);
+      opacity: .35;
+      margin-bottom: -.75rem;
+      user-select: none;
+    }
+
+    .tq-text {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-size: 1rem;
+      line-height: 1.8;
+      color: var(--ink);
+      flex: 1;
+    }
+
+    .tq-footer {
+      display: flex;
+      align-items: center;
+      gap: var(--s3);
+      margin-top: var(--s2);
+    }
+
+    .tq-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--sage);
+      color: #fff;
+      font-family: var(--font-body);
+      font-size: .8125rem;
+      font-weight: 600;
+      letter-spacing: .04em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .tq-author {
+      font-family: var(--font-body);
+      font-size: .8125rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--sage-600);
+      font-weight: 600;
+    }
+
+    .tq-stars { color: var(--gold); font-size: .8125rem; letter-spacing: .05em; }
+
+    /* Wide featured quote */
+    .tq--wide {
+      grid-column: 1 / -1;
+      background: var(--sage-50, #f6f8f4);
+      border-radius: 16px;
+      padding: var(--s6) var(--s7);
+    }
+    .tq--wide .tq-text { font-size: 1.125rem; }
+    .tq--wide .tq-mark { opacity: .5; }
+    @media (max-width: 560px) { .tq--wide { padding: var(--s5); } }
+
+    /* thin separator between rows */
+    .tq-divider {
+      grid-column: 1 / -1;
+      height: 1px;
+      background: var(--sage-100);
+      border: none;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">
+        <img src="Gemini_Generated_Image_36tfxk36tfxk36tf-removebg-preview.png" alt="Moments d'Évasion" data-image-key="navbar_logo" width="155" height="65">
+      </a>
+      <button class="menu-toggle" id="menuToggle" aria-label="Ouvrir le menu"><span></span><span></span><span></span></button>
+      <ul class="nav-menu" id="navMenu">
+        <li><a href="index.html"              class="nav-link">Accueil</a></li>
+        <li><a href="massage-ayurvedique.html" class="nav-link">Ayurvédique</a></li>
+        <li><a href="amma-assis.html"          class="nav-link">Amma Assis</a></li>
+        <li><a href="massage-prenatal.html"    class="nav-link">Prénatal</a></li>
+        <li><a href="magnetisme-reiki.html"    class="nav-link">Magnétisme</a></li>
+        <li><a href="tarifs.html"              class="nav-link">Tarifs</a></li>
+        <li><a href="a-propos.html"            class="nav-link">À Propos</a></li>
+        <li><a href="temoignages.html"         class="nav-link active">Témoignages</a></li>
+        <li><a href="contact.html"             class="nav-link nav-cta">Rendez-vous</a></li>
+        <li class="nav-login"><a href="login.html" class="nav-link">Espace client</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="page-banner">
+    <img src="Gemini_Generated_Image_36tfxk36tfxk36tf.png" alt="Témoignages" class="hero-background" data-image-key="testi_hero_bg">
+    <div class="hero-overlay"></div>
+    <div class="page-banner-content">
+      <p class="page-banner-label">Moments d'Évasion &middot; Montamisé</p>
+      <h1 class="page-banner-title" data-content-key="testi_hero_title">Témoignages</h1>
+      <p class="page-banner-sub" data-content-key="testi_hero_subtitle">Ce que nos clients disent de nous</p>
+    </div>
+  </section>
+
+  <!-- HIGHLIGHT -->
+  <section class="quote-section">
+    <div class="pull-quote reveal">
+      <p>"Michèle possède une écoute extraordinaire. Elle travaille en fonction de ce que notre corps dit de nos maux pour apporter une détente insoupçonnée."</p>
+      <cite>— Elodie T.</cite>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS GRID -->
+  <section class="section-light testi-section">
+    <div class="container">
+      <div class="section-header centered">
+        <span class="eyebrow">Avis vérifiés</span>
+        <h2 class="section-title" data-content-key="testi_hero_title">Ils nous font confiance</h2>
+      </div>
+
+      <div class="testi-flow">
+
+        <!-- Featured wide -->
+        <div class="tq tq--wide reveal">
+          <div class="tq-mark">"</div>
+          <p class="tq-text" data-content-key="testi_16_text">Je te connais Michèle maintenant depuis plusieurs années et au fil des différentes séances, j'ai découvert des pratiques différentes et tout autant appréciables. Le travail ne se fait pas que sur le temps de la séance, il continue à se faire en principe 21 jours. Tu continues à te former pour proposer de nouveaux soins, te perfectionner et répondre encore mieux aux besoins de chacun. Merci d'être là Michèle pour m'aider à guérir, à comprendre, à évoluer, à vivre tout simplement.</p>
+          <div class="tq-footer">
+            <div class="tq-avatar" aria-hidden="true">MP</div>
+            <div>
+              <p class="tq-author" data-content-key="testi_16_author">Maryline P.</p>
+              <p class="tq-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</p>
+            </div>
+          </div>
+        </div>
+
+        <hr class="tq-divider">
+
+        <div class="tq reveal">
+          <div class="tq-mark">"</div>
+          <p class="tq-text" data-content-key="testi_1_text">Douce et attentionnée, Michelle a su adapter le massage en fonction de mes besoins. "Moments d'évasion" porte bien son nom !</p>
+          <div class="tq-footer">
+            <div class="tq-avatar" aria-hidden="true">CN</div>
+            <div>
+              <p class="tq-author" data-content-key="testi_1_author">Céline N.</p>
+              <p class="tq-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="tq reveal">
+          <div class="tq-mark">"</div>
+          <p class="tq-text" data-content-key="testi_2_text">Le massage ayurvédique est efficace pour soulager les endroits du corps qui en ont besoin tout en étant très agréable. Je recommande cette praticienne.</p>
+          <div class="tq-footer">
+            <div class="tq-avatar" aria-hidden="true">SB</div>
+            <div>
+              <p class="tq-author" data-content-key="testi_2_author">Stéphanie B.</p>
+              <p class="tq-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="tq reveal">
+          <div class="tq-mark">"</div>
+          <p class="tq-text" data-content-key="testi_6_text">Moment extraordinaire qui me laisse dans un état de zénitude rarement atteint.</p>
+          <div class="tq-footer">
+            <div class="tq-avatar" aria-hidden="true">HO</div>
+            <div>
+              <p class="tq-author" data-content-key="testi_6_author">Helene O.</p>
+              <p class="tq-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</p>
+            </div>
+          </div>
+        </div>
+
+        <hr class="tq-divider">
+
+        <div class="tq reveal">
+          <div class="tq-mark">"</div>
+          <p class="tq-text" data-content-key="testi_3_text">J'ai pu observer un réel avant-après. Elle a su savoir dans quelle direction aller avec moi. Merci infiniment Michèle pour ce super moment.</p>
+          <div class="tq-footer">
+            <div class="tq-avatar" aria-hidden="true">MF</div>
+            <div>
+              <p class="tq-author" data-content-key="testi_3_author">Marine F.</p>
+              <p class="tq-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="tq reveal">
+          <div class="tq-mark">"</div>
+          <p class="tq-text" data-content-key="testi_4_text">Une bienveillance et une douceur vous enveloppe dès lors que Michele vous apporte ses soins. Merci infiniment à Michele de nous accompagner de ses dons !</p>
+          <div class="tq-footer">
+            <div class="tq-avatar" aria-hidden="true">CF</div>
+            <div>
+              <p class="tq-author" data-content-key="testi_4_author">Carine F.</p>
+              <p class="tq-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="tq reveal">
+          <div class="tq-mark">"</div>
+          <p class="tq-text" data-content-key="testi_5_text">Elle sait écouter notre corps et le respecter. Elle propose une vraie détente, un renouvellement d'énergie qui permet de lâcher prise. Merci Michèle.</p>
+          <div class="tq-footer">
+            <div class="tq-avatar" aria-hidden="true">JA</div>
+            <div>
+              <p class="tq-author" data-content-key="testi_5_author">Jessica A.</p>
+              <p class="tq-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</p>
+            </div>
+          </div>
+        </div>
+
+        <hr class="tq-divider">
+
+        <!-- Featured wide -->
+        <div class="tq tq--wide reveal">
+          <div class="tq-mark">"</div>
+          <p class="tq-text" data-content-key="testi_17_text">Quand votre quotidien est accompagné d'une fibromyalgie, les soins énergétiques de Michèle (même à distance) seront là pour vous soulager. Ils apaiseront cette douleur, vous protégeront des maux qui vous entourent et vous redonneront de l'énergie et du bien-être.</p>
+          <div class="tq-footer">
+            <div class="tq-avatar" aria-hidden="true">EB</div>
+            <div>
+              <p class="tq-author" data-content-key="testi_17_author">Emmanuelle B.</p>
+              <p class="tq-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</p>
+            </div>
+          </div>
+        </div>
+
+        <hr class="tq-divider">
+
+        <div class="tq reveal">
+          <div class="tq-mark">"</div>
+          <p class="tq-text" data-content-key="testi_7_text">C'est rare de ne pas avoir un massage classique. Elle travaille en fonction de ce que notre corps dit de nos maux afin d'apporter une détente insoupçonnée.</p>
+          <div class="tq-footer">
+            <div class="tq-avatar" aria-hidden="true">ET</div>
+            <div>
+              <p class="tq-author" data-content-key="testi_7_author">Elodie T.</p>
+              <p class="tq-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="tq reveal">
+          <div class="tq-mark">"</div>
+          <p class="tq-text" data-content-key="testi_8_text">Un vrai moment de relaxation et de détente. Un grand merci pour cette bulle de zénitude !</p>
+          <div class="tq-footer">
+            <div class="tq-avatar" aria-hidden="true">ML</div>
+            <div>
+              <p class="tq-author" data-content-key="testi_8_author">Mahé L.</p>
+              <p class="tq-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="tq reveal">
+          <div class="tq-mark">"</div>
+          <p class="tq-text" data-content-key="testi_9_text">Les séances d'amma assis me procurent un sentiment de bien-être et de détente importante, libérée des tensions du travail.</p>
+          <div class="tq-footer">
+            <div class="tq-avatar" aria-hidden="true">IL</div>
+            <div>
+              <p class="tq-author" data-content-key="testi_9_author">Isabelle L.</p>
+              <p class="tq-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</p>
+            </div>
+          </div>
+        </div>
+
+        <hr class="tq-divider">
+
+        <div class="tq reveal">
+          <div class="tq-mark">"</div>
+          <p class="tq-text" data-content-key="testi_20_text">Une huile tiède sur le corps, une thérapeute qui avec ses mains sait écouter le corps. Des massages énergiques tout en étant très doux et parfaitement adaptés.</p>
+          <div class="tq-footer">
+            <div class="tq-avatar" aria-hidden="true">VD</div>
+            <div>
+              <p class="tq-author" data-content-key="testi_20_author">Vincent D.</p>
+              <p class="tq-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="tq reveal">
+          <div class="tq-mark">"</div>
+          <p class="tq-text" data-content-key="testi_18_text">Michèle est tellement douce et attentionnée. Mon deuxième massage était peu de temps après mon accouchement — toujours remplie de bienveillance. Merci encore.</p>
+          <div class="tq-footer">
+            <div class="tq-avatar" aria-hidden="true">Z</div>
+            <div>
+              <p class="tq-author" data-content-key="testi_18_author">Zoé</p>
+              <p class="tq-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="tq reveal">
+          <div class="tq-mark">"</div>
+          <p class="tq-text" data-content-key="testi_22_text">On ressort extrêmement délassée et en même temps on retrouve une énergie certaine. À refaire régulièrement.</p>
+          <div class="tq-footer">
+            <div class="tq-avatar" aria-hidden="true">SF</div>
+            <div>
+              <p class="tq-author" data-content-key="testi_22_author">Sandrine F.</p>
+              <p class="tq-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</p>
+            </div>
+          </div>
+        </div>
+
+        <hr class="tq-divider">
+
+        <!-- Featured wide -->
+        <div class="tq tq--wide reveal">
+          <div class="tq-mark">"</div>
+          <p class="tq-text" data-content-key="testi_28_text">Suite à un traitement lourd, Michèle s'est proposée de travailler sur moi à distance. À chaque séance je sentais une nette amélioration. Grâce à ses soins en complément du traitement médical j'ai pu remonter la pente. Je ne la remercierais jamais assez.</p>
+          <div class="tq-footer">
+            <div class="tq-avatar" aria-hidden="true">CD</div>
+            <div>
+              <p class="tq-author" data-content-key="testi_28_author">Carmo D.</p>
+              <p class="tq-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</p>
+            </div>
+          </div>
+        </div>
+
+        <hr class="tq-divider">
+
+        <div class="tq reveal">
+          <div class="tq-mark">"</div>
+          <p class="tq-text" data-content-key="testi_21_text">"Moments d'évasion" porte bien son nom. Un vrai bonheur se terminant par un corps apaisé et un esprit plus léger. Un bien-être total.</p>
+          <div class="tq-footer">
+            <div class="tq-avatar" aria-hidden="true">JS</div>
+            <div>
+              <p class="tq-author" data-content-key="testi_21_author">Jonathan S.</p>
+              <p class="tq-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="tq reveal">
+          <div class="tq-mark">"</div>
+          <p class="tq-text" data-content-key="testi_11_text">Soins énergétiques très doux et très à l'écoute de la personne. À chaque fois je me sens apaisée et rééquilibrée. Je recommande fortement.</p>
+          <div class="tq-footer">
+            <div class="tq-avatar" aria-hidden="true">MO</div>
+            <div>
+              <p class="tq-author" data-content-key="testi_11_author">Momu L.</p>
+              <p class="tq-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="tq reveal">
+          <div class="tq-mark">"</div>
+          <p class="tq-text" data-content-key="testi_13_text">Les massages de Michèle sont un moment de pure détente. Michèle prend le temps de se concentrer sur les points douloureux. Difficile de me passer de notre petit rendez-vous rituel.</p>
+          <div class="tq-footer">
+            <div class="tq-avatar" aria-hidden="true">VT</div>
+            <div>
+              <p class="tq-author" data-content-key="testi_13_author">Valérie T.</p>
+              <p class="tq-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</p>
+            </div>
+          </div>
+        </div>
+
+        <hr class="tq-divider">
+
+        <div class="tq tq--wide reveal">
+          <div class="tq-mark">"</div>
+          <p class="tq-text" data-content-key="testi_29_text">Un grand merci pour l'aide apportée à Heliott. Votre intervention lui a permis de mieux supporter sa chimiothérapie. Vous avez été d'une grande aide durant ces moments difficiles.</p>
+          <div class="tq-footer">
+            <div class="tq-avatar" aria-hidden="true">H</div>
+            <div>
+              <p class="tq-author" data-content-key="testi_29_author">Maîtresse Chien Heliott</p>
+              <p class="tq-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <span class="eyebrow">Vivez l'expérience</span>
+    <h2 data-content-key="testi_cta_title">Vous aussi, rejoignez<br>nos clients satisfaits</h2>
+    <p data-content-key="testi_cta_subtitle">Offrez-vous un moment de bien-être authentique et personnalisé.</p>
+    <a href="contact.html" class="btn btn-accent">Prendre rendez-vous</a>
+  </section>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <img src="Gemini_Generated_Image_36tfxk36tfxk36tf-removebg-preview.png" alt="Moments d'Évasion" class="footer-logo">
+        <p data-content-key="footer_desc">Votre espace de bien-être et de sérénité à Montamisé, près de Poitiers.</p>
+      </div>
+      <nav class="footer-nav">
+        <h4 class="footer-heading">Soins</h4>
+        <ul class="footer-links">
+          <li><a href="massage-ayurvedique.html">Massage Ayurvédique</a></li>
+          <li><a href="amma-assis.html">Massage Amma Assis</a></li>
+          <li><a href="massage-prenatal.html">Massage Prénatal</a></li>
+          <li><a href="magnetisme-reiki.html">Magnétisme &amp; Reiki</a></li>
+        </ul>
+      </nav>
+      <div class="footer-info">
+        <h4 class="footer-heading">Contact</h4>
+        <address>
+          <p data-content-key="footer_address">7 Ter Rue des Sables<br>86360 MONTAMISÉ</p>
+          <p data-content-key="footer_phone"><a href="tel:0631856831">06 31 85 68 31</a></p>
+        </address>
+        <p class="footer-siret" data-content-key="footer_siret">SIRET : 829 717 636 00015</p>
+      </div>
+      <div class="footer-rdv">
+        <h4 class="footer-heading">Rendez-vous</h4>
+        <p>Sur rendez-vous uniquement</p>
+        <a href="contact.html" class="btn btn-accent">Nous contacter</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 Moments d'Évasion &mdash; Tous droits réservés</p>
+      <p class="footer-admin"><a href="login.html">Admin</a></p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script type="module" src="js/auth.js"></script>
+  <script type="module" src="js/admin.js"></script>
+</body>
+</html>
