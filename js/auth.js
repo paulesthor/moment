@@ -99,51 +99,62 @@ async function checkUserRole(user) {
 function createUserMenu(user) {
     removeUserMenu();
 
-    // Target the navbar menu
     const navMenu = document.getElementById('navMenu');
     if (!navMenu) return;
 
     const isAdmin = document.body.classList.contains('is-admin');
-    const userLi = document.createElement('li');
-    userLi.className = 'nav-item user-menu-item';
-    userLi.style.position = 'relative';
+    const initials = (user.email || '?').slice(0, 2).toUpperCase();
 
-    // Button HTML
+    const userLi = document.createElement('li');
+    userLi.className = 'user-menu-item';
+
     userLi.innerHTML = `
-        <a href="#" class="nav-link nav-cta" id="user-menu-btn" style="display: flex; align-items: center; gap: 0.5rem; background: var(--color-primary); color: white; border: 1px solid var(--color-primary); padding: 8px 16px; border-radius: 30px; font-weight: 500; transition: all 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-            <span>👤</span>
-            <span style="font-size: 0.9em;">Mon Espace</span>
-            <span id="unread-badge" style="display: none; width: 10px; height: 10px; background: #e74c3c; border: 2px solid white; border-radius: 50%; position: absolute; top: 0; right: 0;"></span>
-        </a>
-        <div class="user-dropdown" style="display: none; position: absolute; right: 0; top: 120%; background: white; padding: 1rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); min-width: 220px; z-index: 1000; text-align: left; border: 1px solid #eee;">
-            <div style="padding: 0 0.5rem 0.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid #eee; font-size: 0.85rem; color: #666;">
-                Connecté en tant que <br><strong>${user.email?.split('@')[0]}</strong>
+        <button id="user-menu-btn" class="user-menu-btn" aria-haspopup="true" aria-expanded="false">
+            <span class="user-avatar" aria-hidden="true">${initials}</span>
+            <span class="user-menu-label">Mon espace</span>
+            <span id="unread-badge" class="unread-dot" style="display:none;" aria-label="Messages non lus"></span>
+            <svg class="user-chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+
+        <div class="user-dropdown" role="menu">
+            <div class="user-dropdown-header">
+                ${isAdmin ? '<span class="user-badge-admin">Admin</span>' : ''}
+                <p class="user-dropdown-email">${user.email?.split('@')[0]}</p>
             </div>
-            ${isAdmin ? '<div style="margin-bottom: 0.5rem;"><span style="background: var(--color-accent); color: white; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8em; display:inline-block;">Admin</span></div>' : ''}
-            
-            <a href="dashboard.html" style="display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; padding: 0.8rem 0.5rem; margin-bottom: 0.2rem; color: var(--color-text-primary); text-decoration: none; transition: background 0.2s; border-radius: 5px;" onmouseover="this.style.background='#f9f9f9'" onmouseout="this.style.background='transparent'">
-                <span>💬</span> Mes Messages
+
+            <a href="dashboard.html" class="user-dropdown-item" role="menuitem">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                Mes messages
             </a>
 
             ${isAdmin ? `
-            <a href="admin-dashboard.html" style="display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; padding: 0.8rem 0.5rem; margin-bottom: 0.2rem; color: var(--color-primary-dark); font-weight: 600; text-decoration: none; position: relative; border-radius: 5px;" onmouseover="this.style.background='#f9f9f9'" onmouseout="this.style.background='transparent'">
-                <span>⚡</span> Admin
-                <span id="admin-unread-count" style="display: none; background: #e74c3c; color: white; border-radius: 10px; padding: 1px 6px; font-size: 0.7em; margin-left: auto;">0</span>
+            <a href="admin-dashboard.html" class="user-dropdown-item user-dropdown-item--admin" role="menuitem">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z"/></svg>
+                Tableau de bord
+                <span id="admin-unread-count" class="admin-count" style="display:none;">0</span>
             </a>
-            <button id="toggle-edit-btn" style="display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; padding: 0.8rem 0.5rem; margin-bottom: 0.2rem; background: none; border: none; cursor: pointer; color: var(--color-primary-dark); font-family: inherit; border-radius: 5px;" onmouseover="this.style.background='#f9f9f9'" onmouseout="this.style.background='transparent'">
-                <span>✏️</span> Mode Édition
+            <button id="toggle-edit-btn" class="user-dropdown-item" role="menuitem">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/></svg>
+                Mode édition
             </button>
             ` : ''}
-            
-            <hr style="border: 0; border-top: 1px solid #eee; margin: 0.5rem 0;">
-            
-            <button id="logout-btn" style="display: block; width: 100%; text-align: left; padding: 0.5rem; background: none; border: none; cursor: pointer; color: #e74c3c; font-family: inherit;">
-                Se Déconnecter
+
+            <div class="user-dropdown-divider"></div>
+
+            <button id="logout-btn" class="user-dropdown-item user-dropdown-item--danger" role="menuitem">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                Se déconnecter
             </button>
         </div>
     `;
 
-    navMenu.appendChild(userLi);
+    // Insert before the Rendez-vous CTA (last item), not after
+    const ctaItem = navMenu.querySelector('li:has(.nav-cta)');
+    if (ctaItem) {
+        navMenu.insertBefore(userLi, ctaItem);
+    } else {
+        navMenu.appendChild(userLi);
+    }
 
     // Event Listeners
     const btn = userLi.querySelector('#user-menu-btn');
@@ -152,14 +163,15 @@ function createUserMenu(user) {
     // Toggle Dropdown
     btn.addEventListener('click', (e) => {
         e.preventDefault();
-        dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
-        // Hide global badge when opening menu (optional, or keep it)
+        const open = dropdown.classList.toggle('open');
+        btn.setAttribute('aria-expanded', open);
     });
 
     // Close dropdown when clicking outside
     document.addEventListener('click', (e) => {
         if (!userLi.contains(e.target)) {
-            dropdown.style.display = 'none';
+            dropdown.classList.remove('open');
+            btn.setAttribute('aria-expanded', 'false');
         }
     });
 
