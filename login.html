@@ -293,8 +293,12 @@
         if (redirectTarget) {
           window.location.href = decodeURIComponent(redirectTarget);
         } else {
-          const { data: profile } = await supabase.from('profiles').select('role').eq('id', data.user.id).single();
-          window.location.href = profile?.role === 'admin' ? 'admin-dashboard.html' : 'dashboard.html';
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles').select('role').eq('id', data.user.id).single();
+          console.log('Profile result:', profile, 'Error:', profileError);
+          const dest = profile?.role === 'admin' ? 'admin-dashboard.html' : 'dashboard.html';
+          console.log('Redirecting to:', dest);
+          window.location.href = dest;
         }
       } catch (error) {
         console.error('Login error:', error);
