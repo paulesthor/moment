@@ -94,6 +94,15 @@ window.addEventListener('scroll', revealOnScroll);
 // Run on load
 window.addEventListener('load', revealOnScroll);
 
+// === Image fallback — si admin.js ne charge pas, révèle les images après 3s ===
+window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        document.querySelectorAll('img[data-image-key]:not(.loaded)').forEach(img => {
+            img.classList.add('loaded');
+        });
+    }, 3000);
+});
+
 // === Contact Form Handling ===
 const contactForm = document.getElementById('contactForm');
 const formStatus = document.getElementById('formStatus');
