@@ -727,6 +727,8 @@
 
     <!-- Logic -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script>emailjs.init('7xRKBPtxgfwJdMEje');</script>
     <script type="module">
         import { supabase } from './js/config.js';
 
@@ -924,7 +926,6 @@
 
             if (error) { alert('Erreur : ' + error.message); return; }
 
-            // 2. Send message to client
             const d = new Date(apt.start_time);
             const dateStr = d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' }) + ' à ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             const service = (apt.notes || '').split('.')[0];
@@ -933,6 +934,7 @@
                 ? `✅ Votre rendez-vous du ${dateStr} (${service}) a été confirmé. À bientôt !`
                 : `❌ Votre demande de rendez-vous du ${dateStr} (${service}) n'a pas pu être confirmée. N'hésitez pas à me contacter pour trouver un autre créneau.`;
 
+            // 2. Message interne
             await supabase.from('messages').insert({
                 user_id: apt.client_id,
                 sender_id: currentUser.id,
@@ -941,7 +943,37 @@
                 read: false
             });
 
-            // 3. Reload
+            // 3. Email au client via EmailJS
+            if (apt.client_id) {
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('email, full_name')
+                    .eq('id', apt.client_id)
+                    .single();
+
+                if (profile?.email) {
+                    const subject = newStatus === 'confirmé'
+                        ? `✅ Rendez-vous confirmé — ${dateStr}`
+                        : `Votre demande de rendez-vous du ${dateStr}`;
+
+                    const emailMsg = newStatus === 'confirmé'
+                        ? `Votre rendez-vous du ${dateStr} (${service}) est confirmé. Je vous attends avec plaisir !\n\nSi vous avez des questions, répondez à ce message ou contactez-moi directement.`
+                        : `Votre demande de rendez-vous du ${dateStr} (${service}) n'a malheureusement pas pu être confirmée.\n\nN'hésitez pas à me recontacter pour trouver un créneau qui nous convient à tous les deux.`;
+
+                    try {
+                        await emailjs.send('service_w3e7aqh', 'template_naoahzu', {
+                            to_email: profile.email,
+                            client_name: profile.full_name || profile.email.split('@')[0],
+                            subject: subject,
+                            message: emailMsg
+                        });
+                    } catch (emailErr) {
+                        console.warn('Email non envoyé :', emailErr);
+                    }
+                }
+            }
+
+            // 4. Reload
             loadPendingRequests();
             renderCalendarView();
         }
