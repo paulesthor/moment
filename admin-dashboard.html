@@ -238,6 +238,15 @@
             transition: all 0.2s;
         }
 
+        .calendar-day.has-apts {
+            cursor: pointer;
+            border-color: var(--color-primary);
+        }
+        .calendar-day.has-apts:hover {
+            background: #e8f4f8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
         .calendar-day:hover {
             border-color: var(--color-primary);
         }
@@ -476,6 +485,20 @@
                 </table>
             </div>
         </main>
+
+        <!-- DAY DETAIL MODAL -->
+        <div id="day-detail-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; align-items:center; justify-content:center; padding:20px;">
+            <div style="background:white; border-radius:14px; width:100%; max-width:520px; max-height:85vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.2);">
+                <div style="padding:20px 24px 16px; border-bottom:1px solid #f3f4f6; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; background:white; z-index:1;">
+                    <div>
+                        <p style="font-size:.7rem; text-transform:uppercase; letter-spacing:.1em; color:#9ca3af; margin:0 0 2px;">Détail de la journée</p>
+                        <h3 id="day-detail-title" style="margin:0; font-size:1.05rem; color:#111827;"></h3>
+                    </div>
+                    <button onclick="document.getElementById('day-detail-modal').style.display='none'" style="width:32px; height:32px; border-radius:50%; border:none; background:#f3f4f6; cursor:pointer; font-size:1.1rem; color:#6b7280; display:flex; align-items:center; justify-content:center;">✕</button>
+                </div>
+                <div id="day-detail-list" style="padding:16px 24px 24px;"></div>
+            </div>
+        </div>
 
         <!-- MANUAL ENTRY MODAL (Simple overlay) -->
         <div id="manual-apt-modal"
@@ -1051,30 +1074,30 @@
         });
 
         /* --- CALENDAR LOGIC --- */
+        let _calendarApts = []; // cache global pour openDayDetail
+
         async function renderCalendarView() {
             try {
                 const now = new Date();
-                const monthNames = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
+                const monthNames = ["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"];
                 document.getElementById('calendar-month-title').innerText = `${monthNames[now.getMonth()]} ${now.getFullYear()}`;
 
-                // Fetch ALL appointments for current month & next few days
-                console.log('📅 Loading calendar events...');
                 const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
                 const { data: apts, error } = await supabase
                     .from('appointments')
-                    .select(`*, profiles:client_id(full_name)`)
+                    .select(`*, profiles:client_id(full_name, email)`)
                     .gte('start_time', startOfMonth)
                     .order('start_time');
 
                 if (error) throw error;
+                _calendarApts = apts || [];
 
-                // 1. Next 48h
+                // 1. Prochaines 48h
                 const upcomingContainer = document.getElementById('upcoming-list');
-                const in48h = new Date(now.getTime() + 48 * 60 * 60 * 1000);
-
-                const immediateApts = (apts || []).filter(a => {
+                const in48h = new Date(now.getTime() + 48 * 3600 * 1000);
+                const immediateApts = _calendarApts.filter(a => {
                     const d = new Date(a.start_time);
-                    return d >= now && d <= in48h;
+                    return d >= now && d <= in48h && a.status !== 'annulé' && a.status !== 'refusé';
                 });
 
                 if (immediateApts.length === 0) {
@@ -1083,65 +1106,148 @@
                     upcomingContainer.innerHTML = immediateApts.map(a => {
                         const d = new Date(a.start_time);
                         const name = a.client_name || a.profiles?.full_name || 'Inconnu';
-                        return `
-                            <div class="appointment-card">
-                                <div style="font-weight:600; color:var(--color-primary-dark);">${d.toLocaleDateString()} à ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
-                                <div style="font-size:1.1rem; margin:5px 0;">${name}</div>
-                                <div style="font-size:0.9rem; color:#666;">${a.notes || ''}</div>
-                            </div>
-                        `;
+                        const service = (a.notes || '').split('.')[0];
+                        return `<div class="appointment-card">
+                            <div style="font-weight:600; color:var(--color-primary-dark);">${d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})} à ${d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div>
+                            <div style="font-size:1rem; margin:4px 0;">${name}</div>
+                            <div style="font-size:0.85rem; color:#666;">${service}</div>
+                        </div>`;
                     }).join('');
                 }
 
-                // 2. Month Grid
+                // 2. Grille mensuelle
                 const grid = document.getElementById('calendar-grid');
                 grid.innerHTML = '';
-
-                // Days header
-                ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'].forEach(d => {
+                ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'].forEach(d => {
                     grid.innerHTML += `<div class="calendar-day-header">${d}</div>`;
                 });
 
                 const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
-                const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-                const daysInMonth = lastDay.getDate();
-                const startDayIndex = firstDay.getDay(); // 0 = Sunday
+                const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
 
-                // Empty slots
-                for (let i = 0; i < startDayIndex; i++) {
+                for (let i = 0; i < firstDay.getDay(); i++) {
                     grid.innerHTML += `<div style="background:transparent;"></div>`;
                 }
 
-                // Days
                 for (let i = 1; i <= daysInMonth; i++) {
-                    const dayDate = new Date(now.getFullYear(), now.getMonth(), i);
                     const isToday = i === now.getDate();
-
-                    // Count apts for this day
-                    const dayApts = (apts || []).filter(a => {
+                    const dayApts = _calendarApts.filter(a => {
                         const d = new Date(a.start_time);
-                        return d.getDate() === i && d.getMonth() === now.getMonth();
+                        return d.getDate() === i && d.getMonth() === now.getMonth() && a.status !== 'annulé' && a.status !== 'refusé';
                     });
-
-                    let content = `<span class="day-number">${i}</span>`;
-                    if (dayApts.length > 0) {
-                        content += `<span class="day-event-count">${dayApts.length} RDV</span>`;
-                    } else {
-                        content += `<span style="display:block; margin-top:5px; color:#ddd; font-size:0.8rem;">-</span>`;
-                    }
+                    const hasApts = dayApts.length > 0;
 
                     grid.innerHTML += `
-                        <div class="calendar-day ${isToday ? 'today' : ''}">
-                            ${content}
-                        </div>
-                    `;
+                        <div class="calendar-day ${isToday ? 'today' : ''} ${hasApts ? 'has-apts' : ''}"
+                             onclick="${hasApts ? `openDayDetail(${now.getFullYear()},${now.getMonth()},${i})` : ''}">
+                            <span class="day-number">${i}</span>
+                            ${hasApts
+                                ? `<span class="day-event-count">${dayApts.length} RDV</span>`
+                                : `<span style="display:block;margin-top:4px;color:#ddd;font-size:.75rem;">—</span>`}
+                        </div>`;
                 }
             } catch (error) {
                 console.error('Error rendering calendar:', error);
-                document.getElementById('upcoming-list').innerHTML = '<div style="color:red; padding:10px;">Erreur chargement agenda</div>';
-                document.getElementById('calendar-grid').innerHTML = '<div style="color:red; padding:10px;">Erreur - Voir console</div>';
+                document.getElementById('upcoming-list').innerHTML = '<div style="color:red;padding:10px;">Erreur chargement agenda</div>';
+                document.getElementById('calendar-grid').innerHTML = '<div style="color:red;padding:10px;">Erreur - Voir console</div>';
             }
         }
+
+        /* --- DAY DETAIL MODAL --- */
+        window.openDayDetail = function(year, month, day) {
+            const dayApts = _calendarApts.filter(a => {
+                const d = new Date(a.start_time);
+                return d.getFullYear() === year && d.getMonth() === month && d.getDate() === day
+                    && a.status !== 'annulé' && a.status !== 'refusé';
+            });
+            if (!dayApts.length) return;
+
+            const dateLabel = new Date(year, month, day).toLocaleDateString('fr-FR', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+            const modal = document.getElementById('day-detail-modal');
+            document.getElementById('day-detail-title').textContent = dateLabel;
+
+            document.getElementById('day-detail-list').innerHTML = dayApts.map(a => {
+                const d = new Date(a.start_time);
+                const time = d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+                const name = a.client_name || a.profiles?.full_name || 'Inconnu';
+                const service = (a.notes || 'Non précisé').split('.')[0];
+                const statusColors = {confirmé:'#10b981', demandé:'#f59e0b', annulé:'#6b7280'};
+                const statusColor = statusColors[a.status] || '#6b7280';
+                return `
+                <div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:16px 18px; margin-bottom:12px;">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">
+                        <div>
+                            <div style="font-weight:700; font-size:1rem; color:#111827;">${name}</div>
+                            <div style="color:#6b7280; font-size:.85rem; margin-top:2px;">🕐 ${time} &nbsp;·&nbsp; ${service}</div>
+                        </div>
+                        <span style="padding:3px 10px; border-radius:20px; font-size:.75rem; font-weight:600; color:${statusColor}; background:${statusColor}18; border:1px solid ${statusColor}44;">${a.status}</span>
+                    </div>
+                    <div id="cancel-form-${a.id}" style="display:none; margin-top:10px; border-top:1px solid #e5e7eb; padding-top:12px;">
+                        <p style="font-size:.85rem; color:#374151; margin-bottom:8px; font-weight:500;">Motif d'annulation <span style="color:#6b7280; font-weight:400;">(envoyé au client par message et email)</span></p>
+                        <textarea id="cancel-reason-${a.id}" rows="2" placeholder="ex : Indisponibilité imprévue, merci de recontacter pour un nouveau créneau…"
+                            style="width:100%; padding:9px 12px; border:1px solid #d1d5db; border-radius:6px; font-size:.85rem; font-family:inherit; resize:vertical;"></textarea>
+                        <div style="display:flex; gap:8px; margin-top:8px;">
+                            <button onclick="confirmCancelApt(${a.id})" style="padding:7px 16px; background:#ef4444; color:white; border:none; border-radius:6px; font-size:.85rem; font-weight:600; cursor:pointer;">Confirmer l'annulation</button>
+                            <button onclick="document.getElementById('cancel-form-${a.id}').style.display='none'" style="padding:7px 14px; background:#f3f4f6; color:#374151; border:none; border-radius:6px; font-size:.85rem; cursor:pointer;">Annuler</button>
+                        </div>
+                    </div>
+                    ${a.status !== 'annulé' ? `<button onclick="document.getElementById('cancel-form-${a.id}').style.display='block'; this.style.display='none'" style="padding:6px 14px; background:white; color:#ef4444; border:1px solid #fca5a5; border-radius:6px; font-size:.82rem; font-weight:600; cursor:pointer; margin-top:8px;">🗑 Annuler ce RDV</button>` : ''}
+                </div>`;
+            }).join('');
+
+            modal.style.display = 'flex';
+        };
+
+        window.confirmCancelApt = async function(aptId) {
+            const reason = document.getElementById(`cancel-reason-${aptId}`)?.value?.trim();
+            if (!reason) {
+                alert('Veuillez préciser un motif d\'annulation.');
+                return;
+            }
+
+            // 1. Annuler le RDV
+            const { data: apt, error } = await supabase
+                .from('appointments')
+                .update({ status: 'annulé' })
+                .eq('id', aptId)
+                .select('client_id, start_time, notes')
+                .single();
+
+            if (error) { alert('Erreur : ' + error.message); return; }
+
+            const d = new Date(apt.start_time);
+            const dateStr = d.toLocaleDateString('fr-FR', {weekday:'long', day:'numeric', month:'long'}) + ' à ' + d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+            const service = (apt.notes || '').split('.')[0];
+            const fullMsg = `❌ Votre rendez-vous du ${dateStr} (${service}) a été annulé.\n\nMotif : ${reason}\n\nN'hésitez pas à reprendre rendez-vous.`;
+
+            // 2. Message interne
+            if (apt.client_id) {
+                await supabase.from('messages').insert({
+                    user_id: apt.client_id,
+                    sender_id: currentUser.id,
+                    content: fullMsg,
+                    is_admin_reply: true,
+                    read: false
+                });
+
+                // 3. Email via EmailJS
+                const { data: profile } = await supabase.from('profiles').select('email, full_name').eq('id', apt.client_id).single();
+                if (profile?.email) {
+                    try {
+                        await emailjs.send('service_w3e7aqh', 'template_naoahzu', {
+                            to_email: profile.email,
+                            client_name: profile.full_name || profile.email.split('@')[0],
+                            subject: `Annulation de votre rendez-vous du ${dateStr}`,
+                            message: fullMsg
+                        });
+                    } catch (e) { console.warn('Email non envoyé :', e); }
+                }
+            }
+
+            document.getElementById('day-detail-modal').style.display = 'none';
+            loadPendingRequests();
+            renderCalendarView();
+        };
 
         // Add Manual
         document.getElementById('manual-apt-form').addEventListener('submit', async (e) => {
