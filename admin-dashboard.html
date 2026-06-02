@@ -812,22 +812,19 @@
         };
 
         window.switchView = (viewName, el) => {
-            console.log('🔵 switchView called:', viewName);
+            // Désactive tous les items du sidebar
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
             if (el) el.classList.add('active');
 
-            document.querySelectorAll('.view-content').forEach(content => content.classList.remove('active'));
-            document.getElementById('view-overview').style.display = 'none';
-            document.getElementById('view-clients').style.display = 'none';
-            document.getElementById('view-calendar').style.display = 'none';
-            document.getElementById('view-messages').style.display = 'none';
-            if (document.getElementById('view-documents')) {
-                document.getElementById('view-documents').style.display = 'none';
-            }
+            // Cache TOUTES les vues (inline style pour écraser les classes)
+            document.querySelectorAll('.view-content').forEach(v => {
+                v.style.display = 'none';
+                v.classList.remove('active');
+            });
 
-            const validViews = ['overview','clients','calendar','messages','documents','unavailabilities'];
+            // Affiche la vue cible
             const target = document.getElementById(`view-${viewName}`);
-            if (target) target.style.display = 'block';
+            if (target) { target.style.display = 'block'; target.classList.add('active'); }
 
             if (viewName === 'messages') loadConversations();
             if (viewName === 'calendar') { renderCalendarView(); loadPendingRequests(); }
