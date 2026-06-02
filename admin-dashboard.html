@@ -961,14 +961,16 @@
                         : `Votre demande de rendez-vous du ${dateStr} (${service}) n'a malheureusement pas pu être confirmée.\n\nN'hésitez pas à me recontacter pour trouver un créneau qui nous convient à tous les deux.`;
 
                     try {
-                        await emailjs.send('service_w3e7aqh', 'template_naoahzu', {
+                        const result = await emailjs.send('service_w3e7aqh', 'template_naoahzu', {
                             to_email: profile.email,
                             client_name: profile.full_name || profile.email.split('@')[0],
                             subject: subject,
                             message: emailMsg
                         });
+                        console.log('✅ Email envoyé :', result);
                     } catch (emailErr) {
-                        console.warn('Email non envoyé :', emailErr);
+                        console.error('❌ Erreur EmailJS :', emailErr);
+                        alert('Email non envoyé : ' + (emailErr?.text || emailErr?.message || JSON.stringify(emailErr)));
                     }
                 }
             }
