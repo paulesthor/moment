@@ -913,7 +913,7 @@
             }).join('');
         }
 
-        async function handleAppointment(aptId, newStatus, clientName) {
+        window.handleAppointment = async function(aptId, newStatus, clientName) {
             // 1. Update appointment status
             const { data: apt, error } = await supabase
                 .from('appointments')
@@ -978,7 +978,7 @@
             `).join('');
         }
 
-        async function deleteUnavailability(id) {
+        window.deleteUnavailability = async function(id) {
             if (!confirm('Supprimer cette période ?')) return;
             const { error } = await supabase.from('unavailabilities').delete().eq('id', id);
             if (!error) loadUnavailabilities();
