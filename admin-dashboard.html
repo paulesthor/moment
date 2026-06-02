@@ -944,13 +944,15 @@
             });
 
             // 3. Email au client via EmailJS
+            console.log('📧 apt.client_id:', apt.client_id);
             if (apt.client_id) {
-                const { data: profile } = await supabase
+                const { data: profile, error: profileErr } = await supabase
                     .from('profiles')
                     .select('email, full_name')
                     .eq('id', apt.client_id)
                     .single();
 
+                console.log('📧 profile:', profile, 'error:', profileErr);
                 if (profile?.email) {
                     const subject = newStatus === 'confirmé'
                         ? `✅ Rendez-vous confirmé — ${dateStr}`
@@ -960,6 +962,7 @@
                         ? `Votre rendez-vous du ${dateStr} (${service}) est confirmé. Je vous attends avec plaisir !\n\nSi vous avez des questions, répondez à ce message ou contactez-moi directement.`
                         : `Votre demande de rendez-vous du ${dateStr} (${service}) n'a malheureusement pas pu être confirmée.\n\nN'hésitez pas à me recontacter pour trouver un créneau qui nous convient à tous les deux.`;
 
+                    console.log('📧 Envoi EmailJS vers:', profile.email);
                     try {
                         const result = await emailjs.send('service_w3e7aqh', 'template_naoahzu', {
                             to_email: profile.email,
