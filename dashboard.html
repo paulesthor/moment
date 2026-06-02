@@ -222,17 +222,20 @@
                 </div>
 
                 <!-- New Booking Form -->
-                <div
-                    style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 40px; border-left: 4px solid var(--color-primary);">
-                    <h3 style="margin-bottom: 20px;">Demander un nouveau rendez-vous</h3>
+                <div style="background: #fff8e1; border: 1px solid #ffe082; border-radius: 10px; padding: 14px 18px; margin-bottom: 20px; display:flex; align-items:flex-start; gap:12px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#f59e0b" stroke-width="2" style="flex-shrink:0;margin-top:2px"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"/></svg>
+                    <div>
+                        <strong style="color:#92400e; font-size:.9rem;">Ceci est une demande de rendez-vous</strong>
+                        <p style="margin:4px 0 0; font-size:.85rem; color:#78350f;">Votre demande sera examinée par Michèle qui vous confirmera ou vous proposera un autre créneau via la messagerie.</p>
+                    </div>
+                </div>
+                <div style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 40px; border-left: 4px solid var(--color-primary);">
+                    <h3 style="margin-bottom: 20px;">Nouvelle demande de rendez-vous</h3>
                     <form id="bookingForm" class="contact-form" style="max-width: 100%;">
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                             <div class="form-group">
-                                <label class="form-label"
-                                    style="display: block; margin-bottom: 5px; font-weight:500;">Type de Soin</label>
-                                <select id="apt-service" class="form-input"
-                                    style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"
-                                    required>
+                                <label class="form-label" style="display: block; margin-bottom: 5px; font-weight:500;">Type de Soin</label>
+                                <select id="apt-service" class="form-input" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;" required>
                                     <option value="Massage Ayurvédique">Massage Ayurvédique</option>
                                     <option value="Amma Assis">Amma Assis</option>
                                     <option value="Massage Prénatal">Massage Prénatal</option>
@@ -240,24 +243,16 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label class="form-label"
-                                    style="display: block; margin-bottom: 5px; font-weight:500;">Date & Heure
-                                    souhaitée</label>
-                                <input type="datetime-local" id="apt-date" class="form-input"
-                                    style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"
-                                    required>
+                                <label class="form-label" style="display: block; margin-bottom: 5px; font-weight:500;">Date & Heure souhaitée</label>
+                                <input type="datetime-local" id="apt-date" class="form-input" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;" required>
+                                <p id="date-unavail-msg" style="display:none; color:#e74c3c; font-size:.8rem; margin-top:4px;">⚠ Cette période n'est pas disponible.</p>
                             </div>
                         </div>
                         <div class="form-group" style="margin-top: 15px;">
-                            <label class="form-label"
-                                style="display: block; margin-bottom: 5px; font-weight:500;">Message /
-                                Précisions</label>
-                            <textarea id="apt-notes" class="form-textarea"
-                                placeholder="Précisez vos disponibilités ou besoins particuliers..." rows="2"
-                                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></textarea>
+                            <label class="form-label" style="display: block; margin-bottom: 5px; font-weight:500;">Message / Précisions</label>
+                            <textarea id="apt-notes" class="form-textarea" placeholder="Précisez vos disponibilités ou besoins particuliers..." rows="2" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></textarea>
                         </div>
-                        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 20px;">Envoyer la
-                            demande</button>
+                        <button type="submit" id="booking-submit-btn" class="btn btn-primary" style="width: 100%; margin-top: 20px;">Envoyer la demande</button>
                         <div id="bookingMsg" style="margin-top: 15px; text-align: center;"></div>
                     </form>
                 </div>
@@ -395,6 +390,17 @@
         });
 
         /* --- APPOINTMENTS LOGIC --- */
+        function aptStatusBadge(status) {
+            const map = {
+                'demandé':  { color: '#92400e', bg: '#fff8e1', border: '#ffe082', label: '⏳ En attente de confirmation' },
+                'confirmé': { color: '#065f46', bg: '#ecfdf5', border: '#6ee7b7', label: '✓ Confirmé' },
+                'refusé':   { color: '#991b1b', bg: '#fef2f2', border: '#fca5a5', label: '✕ Non disponible' },
+                'annulé':   { color: '#6b7280', bg: '#f3f4f6', border: '#d1d5db', label: 'Annulé' },
+            };
+            const s = map[status] || { color: '#374151', bg: '#f9fafb', border: '#e5e7eb', label: status };
+            return `<span style="display:inline-block; padding:3px 10px; border-radius:20px; font-size:.78rem; font-weight:600; color:${s.color}; background:${s.bg}; border:1px solid ${s.border};">${s.label}</span>`;
+        }
+
         async function loadClientAppointments() {
             if (!currentUser) return;
 
@@ -402,7 +408,7 @@
                 .from('appointments')
                 .select('*')
                 .eq('client_id', currentUser.id)
-                .order('start_time', { ascending: true }); // ASC for correct timeline
+                .order('start_time', { ascending: true });
 
             const upcomingContainer = document.getElementById('upcoming-apts');
             const pastContainer = document.getElementById('past-apts');
@@ -414,43 +420,63 @@
             }
 
             const now = new Date();
-            const upcoming = apts.filter(a => new Date(a.start_time) >= now);
-            const past = apts.filter(a => new Date(a.start_time) < now).reverse(); // Recent past first
+            const upcoming = apts.filter(a => new Date(a.start_time) >= now && a.status !== 'refusé');
+            const past = apts.filter(a => new Date(a.start_time) < now || a.status === 'refusé').reverse();
 
-            /* Upcoming */
             if (upcoming.length === 0) {
-                upcomingContainer.innerHTML = '<p style="color: #666; font-style: italic;">Aucun rendez-vous à venir.</p>';
+                upcomingContainer.innerHTML = '<p style="color: #666; font-style: italic;">Aucune demande en cours.</p>';
             } else {
                 upcomingContainer.innerHTML = upcoming.map(a => `
-                    <div style="background: white; border: 1px solid #e0e0e0; border-left: 4px solid var(--color-primary); padding: 15px; border-radius: 8px;">
-                        <div style="font-weight: 600; color: var(--color-primary-dark); margin-bottom: 5px;">
-                            ${new Date(a.start_time).toLocaleDateString()} à ${new Date(a.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    <div style="background:white; border:1px solid #e5e7eb; border-left:4px solid ${a.status==='confirmé'?'#10b981':a.status==='refusé'?'#ef4444':'#f59e0b'}; padding:15px; border-radius:8px;">
+                        <div style="font-weight:600; color:#1f2937; margin-bottom:6px;">
+                            ${new Date(a.start_time).toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})} à ${new Date(a.start_time).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}
                         </div>
-                        <div style="margin-bottom: 5px; font-weight: 500;">
-                            ${(a.notes || '').split('.')[0]}
-                        </div>
-                        <div style="font-size: 0.85rem; color: ${a.status === 'confirmé' ? '#27ae60' : '#f39c12'}; font-weight: 600;">
-                            ${a.status.toUpperCase()}
-                        </div>
+                        <div style="color:#6b7280; font-size:.9rem; margin-bottom:8px;">${(a.notes||'').split('.')[0]}</div>
+                        ${aptStatusBadge(a.status)}
                     </div>
                 `).join('');
             }
 
-            /* Past */
             if (past.length === 0) {
                 pastContainer.innerHTML = '<p style="color: #999; font-style: italic;">Aucun historique.</p>';
             } else {
                 pastContainer.innerHTML = past.map(a => `
-                    <div style="background: #f9f9f9; padding: 10px 15px; border-radius: 8px; display:flex; justify-content:space-between; align-items:center; opacity: 0.7;">
+                    <div style="background:#f9fafb; padding:10px 15px; border-radius:8px; display:flex; justify-content:space-between; align-items:center; gap:10px;">
                         <div>
-                            <span style="font-weight: 600; color: #777;">${new Date(a.start_time).toLocaleDateString()}</span>
-                            <span style="color: #888; margin-left:10px; font-size:0.9rem;">${(a.notes || 'Soin').split('.')[0]}</span>
+                            <span style="font-weight:600; color:#6b7280;">${new Date(a.start_time).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'})}</span>
+                            <span style="color:#9ca3af; margin-left:8px; font-size:.88rem;">${(a.notes||'Soin').split('.')[0]}</span>
                         </div>
-                        <span style="font-size: 0.8rem; background: #eee; padding: 2px 8px; border-radius: 10px; color: #777;">Terminé</span>
+                        ${aptStatusBadge(a.status === 'confirmé' ? 'confirmé' : a.status === 'refusé' ? 'refusé' : 'annulé')}
                     </div>
                 `).join('');
             }
         }
+
+        // Vérifie si la date choisie tombe dans une indisponibilité
+        async function checkDateAvailability(dateStr) {
+            if (!dateStr) return true;
+            const chosen = new Date(dateStr).toISOString().slice(0, 10);
+            const { data } = await supabase.from('unavailabilities').select('start_date, end_date');
+            if (!data) return true;
+            return !data.some(u => chosen >= u.start_date && chosen <= u.end_date);
+        }
+
+        document.getElementById('apt-date').addEventListener('change', async function() {
+            const available = await checkDateAvailability(this.value);
+            const msg = document.getElementById('date-unavail-msg');
+            const btn = document.getElementById('booking-submit-btn');
+            msg.style.display = available ? 'none' : 'block';
+            btn.disabled = !available;
+            btn.style.opacity = available ? '1' : '0.5';
+        });
+
+        // Temps réel : recharge les RDV si statut change
+        supabase.channel('client-apt-updates')
+            .on('postgres_changes', {
+                event: 'UPDATE', schema: 'public', table: 'appointments',
+                filter: `client_id=eq.${currentUser?.id}`
+            }, () => loadClientAppointments())
+            .subscribe();
 
         document.getElementById('bookingForm').addEventListener('submit', async (e) => {
             e.preventDefault();
