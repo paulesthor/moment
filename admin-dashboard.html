@@ -369,6 +369,25 @@
         .btn-confirm { padding: 5px 14px; background: #10b981; color: white; border: none; border-radius: 6px; font-size: .78rem; font-weight: 600; cursor: pointer; }
         .btn-reject  { padding: 5px 14px; background: #ef4444; color: white; border: none; border-radius: 6px; font-size: .78rem; font-weight: 600; cursor: pointer; }
     </style>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <style>
+    .flatpickr-calendar { font-family: var(--font-body,'Montserrat',sans-serif); border-radius:14px; border:1px solid rgba(107,142,107,.2); box-shadow:0 8px 32px rgba(10,22,16,.12); overflow:hidden; }
+    .flatpickr-months { background:var(--forest,#2d4a3e); padding:6px 0; }
+    .flatpickr-months .flatpickr-month, .flatpickr-months .flatpickr-prev-month, .flatpickr-months .flatpickr-next-month { color:white; fill:white; }
+    .flatpickr-months .flatpickr-prev-month:hover svg, .flatpickr-months .flatpickr-next-month:hover svg { fill:var(--gold,#c9a96e); }
+    .flatpickr-current-month .cur-month { color:white; font-weight:600; }
+    .flatpickr-current-month input.cur-year { color:rgba(255,255,255,.75); }
+    .flatpickr-weekdays { background:var(--forest,#2d4a3e); padding-bottom:6px; }
+    span.flatpickr-weekday { color:rgba(255,255,255,.55); font-size:.7rem; font-weight:700; letter-spacing:.08em; }
+    .flatpickr-day { border-radius:8px; font-size:.83rem; transition:background 150ms; }
+    .flatpickr-day:hover { background:rgba(107,142,107,.12); color:var(--forest,#2d4a3e); }
+    .flatpickr-day.selected,.flatpickr-day.selected:hover { background:var(--forest,#2d4a3e); border-color:var(--forest,#2d4a3e); color:white; }
+    .flatpickr-day.today { border-color:var(--gold,#c9a96e); font-weight:700; }
+    .flatpickr-day.disabled { color:#d1d5db; }
+    .flatpickr-time { border-top:1px solid rgba(107,142,107,.15); }
+    .flatpickr-time input { font-size:.9rem; font-weight:600; color:var(--forest,#2d4a3e); }
+    .flatpickr-input { cursor:pointer; }
+  </style>
 </head>
 
 <body>
@@ -606,8 +625,8 @@
                     </div>
                     <div style="margin-bottom: 15px;">
                         <label style="display:block; margin-bottom:5px;">Date & Heure</label>
-                        <input type="datetime-local" id="manual-date"
-                            style="width:100%; padding:10px; border:1px solid #ddd; border-radius:5px;" required>
+                        <input type="text" id="manual-date" placeholder="Choisir une date et une heure…"
+                            style="width:100%; padding:10px; border:1px solid #ddd; border-radius:5px;" required readonly>
                     </div>
                     <div style="margin-bottom: 15px;">
                         <label style="display:block; margin-bottom:5px;">Notes</label>
@@ -844,6 +863,20 @@
 
     <!-- Logic -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/fr.js"></script>
+    <script>
+        flatpickr('#manual-date', {
+            locale: 'fr',
+            enableTime: true,
+            dateFormat: 'Y-m-d H:i',
+            altInput: true,
+            altFormat: 'l j F Y à H:i',
+            minuteIncrement: 15,
+            time_24hr: true,
+            disableMobile: true
+        });
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script>emailjs.init('7xRKBPtxgfwJdMEje');</script>
     <script type="module">
