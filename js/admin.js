@@ -288,23 +288,24 @@ async function loadDynamicContent() {
                 : item.content;
         });
 
-        // Update Images and Reveal ALL dynamic images
+        // Update Images — hero backgrounds en priorité haute
         dynamicImages.forEach(img => {
             const key = img.getAttribute('data-image-key');
             if (dataMap.has(key)) {
-                img.src = dataMap.get(key);
+                const url = dataMap.get(key);
 
-                // Wait for new image to actually load before revealing
-                img.onload = () => {
-                    img.classList.add('loaded');
-                };
-
-                // Handle case where image is cached/already loaded
-                if (img.complete) {
-                    img.classList.add('loaded');
+                // Priorité haute pour les images above-the-fold (hero)
+                if (img.classList.contains('hero-background')) {
+                    img.setAttribute('fetchpriority', 'high');
+                    img.setAttribute('loading', 'eager');
+                } else {
+                    img.setAttribute('loading', 'lazy');
                 }
+
+                img.src = url;
+                img.onload = () => img.classList.add('loaded');
+                if (img.complete) img.classList.add('loaded');
             } else {
-                // No custom image found, reveal default immediately
                 img.classList.add('loaded');
             }
         });
