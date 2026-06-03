@@ -345,7 +345,7 @@
 
             <!-- Profile View (Hidden) -->
             <div id="view-profile" style="display: none;">
-                <h2 style="margin-bottom: 20px; color: var(--color-primary-dark);">Mon Profil</h2>
+                <h2 style="margin-bottom: 20px; color: var(--forest, #2d4a3e);">Mon Profil</h2>
                 <div class="form-group" style="margin-bottom: 15px;">
                     <label class="form-label" style="display:block; margin-bottom: 5px;">Nom complet</label>
                     <input type="text" class="form-input" id="profileName" readonly
@@ -355,6 +355,24 @@
                     <label class="form-label" style="display:block; margin-bottom: 5px;">Email</label>
                     <input type="email" class="form-input" id="profileEmail" readonly
                         style="background: #f9f9f9; width: 100%; padding: 10px; border:1px solid #ddd; border-radius:5px;">
+                </div>
+
+                <!-- Droits RGPD -->
+                <div style="margin-top: 40px; padding: 24px; background: #fef2f2; border: 1px solid #fca5a5; border-radius: 10px;">
+                    <h3 style="margin: 0 0 10px; font-size: 1rem; color: #991b1b;">Supprimer mon compte</h3>
+                    <p style="font-size: .875rem; color: #6b7280; margin-bottom: 16px; line-height: 1.6;">
+                        Conformément au <strong>RGPD (Art. 17)</strong>, vous pouvez demander la suppression de votre compte et de toutes vos données personnelles (profil, messages, historique de rendez-vous).<br>
+                        Cette action est <strong>irréversible</strong>.
+                    </p>
+                    <button id="delete-account-btn" style="padding: 10px 20px; background: #ef4444; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: .875rem;">
+                        Supprimer mon compte et mes données
+                    </button>
+                    <p id="delete-account-msg" style="display:none; margin-top: 10px; font-size: .825rem;"></p>
+                </div>
+
+                <div style="margin-top: 16px; font-size: .8rem; color: #9ca3af;">
+                    <a href="confidentialite.html" style="color: var(--forest, #2d4a3e);">Politique de confidentialité</a> &middot;
+                    <a href="mentions-legales.html" style="color: var(--forest, #2d4a3e);">Mentions légales</a>
                 </div>
             </div>
         </main>
@@ -691,6 +709,43 @@
             const container = document.getElementById('chatMessages');
             container.scrollTop = container.scrollHeight;
         }
+
+        /* --- SUPPRESSION DE COMPTE (RGPD Art. 17) --- */
+        document.getElementById('delete-account-btn').addEventListener('click', async () => {
+            const msg = document.getElementById('delete-account-msg');
+            const confirmed = confirm(
+                'Êtes-vous certain de vouloir supprimer votre compte ?\n\n' +
+                'Toutes vos données (profil, messages, rendez-vous) seront définitivement effacées. Cette action est irréversible.'
+            );
+            if (!confirmed) return;
+
+            const btn = document.getElementById('delete-account-btn');
+            btn.disabled = true;
+            btn.textContent = 'Suppression en cours…';
+
+            try {
+                // 1. Supprimer les messages
+                await supabase.from('messages').delete().eq('user_id', currentUser.id);
+                // 2. Annuler les rendez-vous à venir
+                await supabase.from('appointments').update({ status: 'annulé' })
+                    .eq('client_id', currentUser.id).eq('status', 'demandé');
+                // 3. Supprimer le profil
+                await supabase.from('profiles').delete().eq('id', currentUser.id);
+                // 4. Déconnecter et supprimer le compte auth
+                await supabase.auth.signOut();
+
+                msg.style.display = 'block';
+                msg.style.color = '#10b981';
+                msg.textContent = 'Compte supprimé. Vous allez être redirigé…';
+                setTimeout(() => window.location.href = 'index.html', 2000);
+            } catch (e) {
+                btn.disabled = false;
+                btn.textContent = 'Supprimer mon compte et mes données';
+                msg.style.display = 'block';
+                msg.style.color = '#ef4444';
+                msg.textContent = 'Une erreur est survenue. Contactez-nous à contact@moment-evasion.fr';
+            }
+        });
 
         function subscribeToMessages() {
             supabase

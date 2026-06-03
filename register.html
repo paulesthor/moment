@@ -281,6 +281,14 @@
           <input type="password" id="confirmPassword" class="form-input" required placeholder="••••••••" autocomplete="new-password">
         </div>
 
+        <!-- Consentement RGPD -->
+        <div class="form-group" style="margin-top: var(--s4);">
+          <label style="display:flex; align-items:flex-start; gap:.75rem; cursor:pointer; font-size:.85rem; color:var(--stone); line-height:1.5;">
+            <input type="checkbox" id="consent-rgpd" required style="margin-top:3px; flex-shrink:0; width:16px; height:16px; accent-color:var(--forest);">
+            <span>J'ai lu et j'accepte la <a href="confidentialite.html" target="_blank" style="color:var(--forest); font-weight:600;">politique de confidentialité</a>. J'accepte que mes données (nom, email, historique de rendez-vous) soient traitées par Moments d'Évasion pour la gestion de mon espace client.</span>
+          </label>
+        </div>
+
         <!-- Honeypot anti-bot : invisible pour les humains, rempli par les bots -->
         <div style="position:absolute; left:-9999px; top:-9999px;" aria-hidden="true">
           <label for="website">Ne pas remplir</label>
@@ -311,6 +319,7 @@
         Déjà un compte ? <a href="login.html">Se connecter</a>
       </div>
 
+      <div style="text-align:center; margin-top:var(--s3); font-size:.75rem;"><a href="mentions-legales.html" style="color:var(--mist);">Mentions légales</a> &middot; <a href="confidentialite.html" style="color:var(--mist);">Confidentialité</a></div>
       <a href="index.html" class="auth-back">&#8592; Retour au site</a>
     </div>
   </div>
@@ -332,6 +341,12 @@
 
       // Honeypot : si le champ caché est rempli, c'est un bot — on ignore silencieusement
       if (document.getElementById('website').value) return;
+
+      // Vérification consentement RGPD
+      if (!document.getElementById('consent-rgpd').checked) {
+        showMsg('Veuillez accepter la politique de confidentialité pour continuer.', 'error');
+        return;
+      }
 
       showMsg('Création du compte...', '');
 
