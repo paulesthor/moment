@@ -2,6 +2,9 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
+  <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Connexion | Moments d'Évasion</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -291,14 +294,15 @@
         const redirectTarget = urlParams.get('redirect');
 
         if (redirectTarget) {
-          window.location.href = decodeURIComponent(redirectTarget);
+          // Open redirect fix: only allow same-origin redirects
+          const decoded = decodeURIComponent(redirectTarget);
+          const isSafeRedirect = decoded.startsWith('/') ||
+            decoded.startsWith(window.location.origin);
+          window.location.href = isSafeRedirect ? decoded : 'dashboard.html';
         } else {
-          const { data: profile, error: profileError } = await supabase
+          const { data: profile } = await supabase
             .from('profiles').select('role').eq('id', data.user.id).single();
-          console.log('Profile result:', profile, 'Error:', profileError);
-          const dest = profile?.role === 'admin' ? 'admin-dashboard.html' : 'dashboard.html';
-          console.log('Redirecting to:', dest);
-          window.location.href = dest;
+          window.location.href = profile?.role === 'admin' ? 'admin-dashboard.html' : 'dashboard.html';
         }
       } catch (error) {
         console.error('Login error:', error);

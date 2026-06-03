@@ -3,3 +3,8 @@ ancienne version/
 .DS_Store
 Thumbs.db
 desktop.ini
+.agent/
+test-supabase.html
+test-calendar-sync.html
+ADMIN_MIGRATION_GUIDE.md
+CALENDAR_SYNC_DEPLOYMENT.md

@@ -3,6 +3,9 @@
 
 <head>
     <meta charset="UTF-8">
+  <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mon Espace | Moments d'Évasion</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -386,6 +389,11 @@
                 document.getElementById('view-profile').style.display = 'block';
             }
         };
+
+        function escHtml(str) {
+            if (str == null) return '';
+            return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#x27;');
+        }
 
         // Init Flatpickr date picker
         flatpickr('#apt-date', {

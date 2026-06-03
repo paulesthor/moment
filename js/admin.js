@@ -283,7 +283,9 @@ async function loadDynamicContent() {
         data.forEach(item => {
             // Update Text
             const textEl = document.querySelector(`[data-content-key="${item.key}"]`);
-            if (textEl) textEl.innerHTML = item.content;
+            if (textEl) textEl.innerHTML = typeof DOMPurify !== 'undefined'
+                ? DOMPurify.sanitize(item.content)
+                : item.content;
         });
 
         // Update Images and Reveal ALL dynamic images
