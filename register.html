@@ -281,6 +281,12 @@
           <input type="password" id="confirmPassword" class="form-input" required placeholder="••••••••" autocomplete="new-password">
         </div>
 
+        <!-- Honeypot anti-bot : invisible pour les humains, rempli par les bots -->
+        <div style="position:absolute; left:-9999px; top:-9999px;" aria-hidden="true">
+          <label for="website">Ne pas remplir</label>
+          <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+        </div>
+
         <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">
           Créer mon compte
         </button>
@@ -323,10 +329,14 @@
 
     registerForm.addEventListener('submit', async (e) => {
       e.preventDefault();
+
+      // Honeypot : si le champ caché est rempli, c'est un bot — on ignore silencieusement
+      if (document.getElementById('website').value) return;
+
       showMsg('Création du compte...', '');
 
-      const fullName        = document.getElementById('fullName').value;
-      const email           = document.getElementById('email').value;
+      const fullName        = document.getElementById('fullName').value.trim();
+      const email           = document.getElementById('email').value.trim();
       const password        = document.getElementById('password').value;
       const confirmPassword = document.getElementById('confirmPassword').value;
 
