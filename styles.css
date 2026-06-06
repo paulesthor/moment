@@ -1938,9 +1938,225 @@ strong { color: var(--ink); font-weight: 600; }
 }
 
 @media (max-width: 520px) {
-  .hero-title { font-size: 3rem; }
+  .hero-title { font-size: 2.6rem; }
   .split-stats { grid-template-columns: 1fr 1fr; }
   .footer-inner,
   .footer-content { grid-template-columns: 1fr; }
   .hero-actions { flex-direction: column; align-items: flex-start; }
+}
+
+/* ══════════════════════════════════════════════
+   RESPONSIVE MOBILE COMPLET — 430px et moins
+   ══════════════════════════════════════════════ */
+
+/* ── Fondamentaux ── */
+@media (max-width: 430px) {
+  :root {
+    --s5: 1.1rem;
+    --s6: 1.4rem;
+    --s8: 2rem;
+    --s10: 2.5rem;
+    --s12: 3rem;
+  }
+
+  body { -webkit-text-size-adjust: 100%; }
+
+  /* ── Sections ── */
+  .section-light,
+  .section-dark { padding: var(--s8) var(--s4); }
+
+  .container { padding: 0 var(--s3); }
+
+  .section-title { font-size: clamp(1.5rem, 6vw, 2rem); }
+
+  /* ── Hero principal ── */
+  .hero-title { font-size: clamp(2rem, 9vw, 2.8rem); line-height: 1.15; }
+  .hero-subtitle { font-size: .9rem; }
+  .hero-content { padding: 0 var(--s3) var(--s6); }
+  .hero-actions { flex-direction: column; align-items: stretch; gap: var(--s2); }
+  .hero-actions .btn { text-align: center; justify-content: center; }
+
+  /* ── Page banner ── */
+  .page-banner { min-height: 55vw; }
+  .page-banner-title { font-size: clamp(1.8rem, 8vw, 2.4rem); }
+  .page-banner-sub { font-size: .85rem; }
+
+  /* ── Navbar ── */
+  .nav-logo img { height: 46px; width: auto; min-width: unset; max-width: 120px; }
+
+  /* ── Services (pages individuelles) ── */
+  .service-img { height: 220px; }
+  .service-body { padding: var(--s5) var(--s3); }
+  .service-body h2 { font-size: 1.5rem; }
+
+  /* ── Pricing ── */
+  .pricing-card { padding: var(--s5) var(--s4); }
+  .pricing-price { font-size: 2rem; }
+
+  /* ── Practical info grid ── */
+  .practical-grid { grid-template-columns: 1fr; gap: var(--s3); }
+
+  /* ── Témoignages ── */
+  .tq--wide { padding: var(--s4); }
+  .tq-text { font-size: .9rem; }
+  .quote-section { padding: var(--s6) var(--s3); }
+
+  /* ── Steps ── */
+  .steps { gap: var(--s4); }
+  .step { gap: var(--s3); }
+  .step-num { width: 36px; height: 36px; font-size: .9rem; flex-shrink: 0; }
+
+  /* ── Feat strip ── */
+  .feat-strip { grid-template-columns: 1fr; }
+
+  /* ── CTA section ── */
+  .cta-section { padding: var(--s8) var(--s4); }
+  .cta-section h2 { font-size: 1.6rem; }
+
+  /* ── Footer ── */
+  .footer-inner { grid-template-columns: 1fr; gap: var(--s5); padding: var(--s6) var(--s4); }
+  .footer-bottom { flex-direction: column; gap: .4rem; text-align: center; padding: var(--s3) var(--s4); }
+  .footer-legal { justify-content: center; }
+
+  /* ── Contact grid ── */
+  .contact-grid { grid-template-columns: 1fr; gap: var(--s4); }
+
+  /* ── Split layout ── */
+  .split-layout { grid-template-columns: 1fr; }
+  .split-stats  { grid-template-columns: 1fr 1fr; }
+
+  /* ── Glass cards ── */
+  .card-grid { grid-template-columns: 1fr; }
+  .glass-card { padding: var(--s4); }
+
+  /* ── Pull quote ── */
+  .pull-quote { padding: var(--s5) var(--s4); font-size: 1rem; }
+
+  /* ── Forms ── */
+  .contact-form .form-group + .form-group { margin-top: var(--s3); }
+  .form-input, .form-textarea { font-size: 1rem; }
+
+  /* ── Cookie banner ── */
+  #cookie-banner { padding: var(--s3); }
+  .cookie-actions { flex-direction: column; }
+  .cookie-btn { text-align: center; }
+
+  /* ── Auth pages ── */
+  .auth-heading { font-size: 1.5rem; }
+}
+
+/* ── Dashboard client mobile ── */
+@media (max-width: 640px) {
+  .dashboard-container {
+    grid-template-columns: 1fr !important;
+    margin-top: calc(var(--nav-h) + 1rem) !important;
+    gap: 0 !important;
+    padding: 0 !important;
+  }
+  .sidebar {
+    border-radius: 0 !important;
+    padding: 10px 0 !important;
+    margin-bottom: 0 !important;
+  }
+  .sidebar-menu {
+    display: flex;
+    flex-direction: row;
+    gap: 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-bottom: 1px solid #eee;
+    padding: 0 !important;
+  }
+  .sidebar-item { margin: 0 !important; flex-shrink: 0; }
+  .sidebar-link {
+    white-space: nowrap;
+    padding: 12px 16px !important;
+    border-radius: 0 !important;
+    border-bottom: 3px solid transparent;
+    font-size: .8rem !important;
+  }
+  .sidebar-link.active { border-bottom-color: var(--forest); background: rgba(107,142,107,.06); }
+  .content-area { border-radius: 0 !important; padding: 20px 16px !important; }
+  #view-booking > div[style*="grid-template-columns"] {
+    display: flex !important; flex-direction: column !important;
+  }
+}
+
+/* ── Admin dashboard mobile ── */
+@media (max-width: 768px) {
+  .admin-layout {
+    grid-template-columns: 1fr !important;
+    height: auto !important;
+    overflow: visible !important;
+    position: relative;
+  }
+  .admin-sidebar-toggle {
+    display: flex !important;
+  }
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 260px;
+    height: 100dvh;
+    z-index: 2000;
+    transition: left 280ms ease;
+    overflow-y: auto;
+  }
+  .sidebar.mobile-open { left: 0; }
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.45);
+    z-index: 1999;
+  }
+  .sidebar-overlay.active { display: block; }
+  .view-content {
+    height: auto !important;
+    overflow-y: visible !important;
+    padding: 20px 16px !important;
+  }
+  .admin-mobile-bar {
+    display: flex !important;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--forest);
+    align-items: center;
+    padding: 12px 16px;
+    gap: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.15);
+  }
+  .admin-mobile-bar-title {
+    color: white;
+    font-size: .9rem;
+    font-weight: 600;
+    letter-spacing: .04em;
+    flex: 1;
+  }
+  /* Stats en 2 colonnes */
+  .stats-grid { grid-template-columns: 1fr 1fr !important; }
+  /* Calendrier compact */
+  .calendar-day { min-height: 48px !important; padding: 4px !important; }
+  .day-number { font-size: .7rem !important; }
+  .day-event-count { font-size: .6rem !important; padding: 1px 4px !important; }
+  /* Messaging mobile */
+  .messaging-layout { grid-template-columns: 1fr !important; height: auto !important; }
+  .conversation-list {
+    max-height: 220px;
+    border-right: none !important;
+    border-bottom: 1px solid #f0f0ee;
+  }
+  /* Unavailabilities form */
+  #unavail-form { grid-template-columns: 1fr !important; }
+  /* Pending requests */
+  .chat-pending-apt { flex-wrap: wrap; }
+  /* Tables scroll horizontal */
+  .admin-card { overflow-x: auto; }
+  .client-table { min-width: 480px; }
+  /* Documents grid */
+  [style*="grid-template-columns: 1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
 }
