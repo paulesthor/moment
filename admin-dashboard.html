@@ -4,7 +4,6 @@
 <head>
     <meta charset="UTF-8">
   <link rel="preconnect" href="https://uskjzczcuawhmrlwszpc.supabase.co">
-  <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <meta name="referrer" content="strict-origin-when-cross-origin">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1006,21 +1005,33 @@
             if (viewName === 'unavailabilities') loadUnavailabilities();
         };
 
-        // LEGACY INSTANT LOADING LOGIC
-        // Utilise onAuthStateChange pour la sécurité, mais sans bloquer l'UI
-        supabase.auth.onAuthStateChange(async (event, session) => {
-            // OAuth Callback Check
-            if (!session) {
-                const isOAuthReturn = window.location.hash.includes('access_token') ||
-                    window.location.search.includes('code=');
-                if (isOAuthReturn) return;
+        // ── Chargement initial via getSession (fiable, sans dépendre du timing des events) ──
+        async function initAdminDashboard() {
+            const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+
+            if (sessionError) {
+                console.error('Erreur session:', sessionError);
                 window.location.href = 'login.html';
                 return;
             }
 
+            if (!session) {
+                const isOAuthReturn = window.location.hash.includes('access_token') ||
+                    window.location.search.includes('code=');
+                if (!isOAuthReturn) window.location.href = 'login.html';
+                return;
+            }
+
             // ── SECURITY: vérifier que l'utilisateur est bien admin ──
-            const { data: roleCheck } = await supabase
-                .from('profiles').select('role').eq('id', session.user.id).single();
+            const { data: roleCheck, error: roleError } = await supabase
+                .from('profiles').select('role').eq('id', session.user.id).maybeSingle();
+
+            if (roleError) {
+                console.error('Erreur vérification rôle:', roleError);
+                window.location.href = 'login.html';
+                return;
+            }
+
             if (roleCheck?.role !== 'admin') {
                 await supabase.auth.signOut();
                 window.location.href = 'index.html';
@@ -1037,8 +1048,30 @@
             loadOverviewStats();
             loadClients();
             loadPendingRequests();
-            if (typeof checkCalendarSyncStatus === 'function') checkCalendarSyncStatus();
+            checkCalendarSyncStatus();
+        }
+
+        // ── Surveillance des changements d'état (déconnexion, refresh token) ──
+        supabase.auth.onAuthStateChange(async (event, session) => {
+            if (event === 'SIGNED_OUT') {
+                window.location.href = 'login.html';
+                return;
+            }
+            // Sauvegarder le refresh token après connexion Google Calendar
+            if (event === 'SIGNED_IN' && session?.provider_token && session?.provider_refresh_token) {
+                const { error } = await supabase
+                    .from('google_calendar_tokens')
+                    .upsert({
+                        user_id: session.user.id,
+                        refresh_token: session.provider_refresh_token,
+                        access_token: session.provider_token,
+                        token_expires_at: new Date(Date.now() + 3600 * 1000).toISOString()
+                    });
+                if (!error) await checkCalendarSyncStatus();
+            }
         });
+
+        initAdminDashboard();
 
         /* --- PENDING REQUESTS --- */
         async function loadPendingRequests() {
@@ -1773,24 +1806,6 @@
             }
         }
 
-        // Sauvegarder le refresh token après OAuth
-        supabase.auth.onAuthStateChange(async (event, session) => {
-            if (event === 'SIGNED_IN' && session?.provider_token && session?.provider_refresh_token) {
-                const { error } = await supabase
-                    .from('google_calendar_tokens')
-                    .upsert({
-                        user_id: session.user.id,
-                        refresh_token: session.provider_refresh_token,
-                        access_token: session.provider_token,
-                        token_expires_at: new Date(Date.now() + 3600 * 1000).toISOString()
-                    });
-
-                if (!error) {
-                    await checkCalendarSyncStatus();
-                }
-            }
-        });
-
         // Make connectGoogleCalendar globally accessible
         window.connectGoogleCalendar = connectGoogleCalendar;
 
@@ -1839,11 +1854,6 @@
 
 
 
-        // Initial load - DISABLED: using getSession callback instead (line 797-803)
-        // document.addEventListener('DOMContentLoaded', async () => {
-        //     switchView('overview');
-        //     await checkCalendarSyncStatus();
-        // });
     </script>
 </body>
 
