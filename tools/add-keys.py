@@ -9,9 +9,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 PAGES = {
-    'index.html': 'home', 'a-propos.html': 'about', 'amma-assis.html': 'amma',
-    'massage-ayurvedique.html': 'ayurvedique', 'massage-prenatal.html': 'prenatal',
-    'magnetisme-reiki.html': 'reiki', 'tarifs.html': 'tarifs', 'temoignages.html': 'testy',
+    'index.html': 'home', 'a-propos.html': 'about', 'massage.html': 'massage',
+    'soins-energetiques.html': 'reiki', 'tarifs.html': 'tarifs', 'temoignages.html': 'testy',
     'contact.html': 'contact', 'mentions-legales.html': 'legal', 'confidentialite.html': 'privacy',
 }
 VOID = {'br', 'img', 'input', 'hr', 'meta', 'link', 'source', 'wbr', 'area', 'base', 'col', 'embed', 'param', 'track'}

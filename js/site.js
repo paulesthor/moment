@@ -9,10 +9,8 @@ export const CONFIG_KEY = '__site_pages';
 // `protected` = ne peut pas être supprimée.
 export const STATIC_PAGES = [
     { id: 'index', file: 'index.html', title: 'Accueil', protected: true },
-    { id: 'massage-ayurvedique', file: 'massage-ayurvedique.html', title: 'Ayurvédique' },
-    { id: 'amma-assis', file: 'amma-assis.html', title: 'Amma Assis' },
-    { id: 'massage-prenatal', file: 'massage-prenatal.html', title: 'Prénatal' },
-    { id: 'magnetisme-reiki', file: 'magnetisme-reiki.html', title: 'Magnétisme' },
+    { id: 'massage', file: 'massage.html', title: 'Massage' },
+    { id: 'soins-energetiques', file: 'soins-energetiques.html', title: 'Soins énergétiques' },
     { id: 'tarifs', file: 'tarifs.html', title: 'Tarifs' },
     { id: 'a-propos', file: 'a-propos.html', title: 'À Propos' },
     { id: 'temoignages', file: 'temoignages.html', title: 'Témoignages' },
@@ -174,7 +172,7 @@ export function parseConfig(raw) {
 
 export const saveConfig = (config) => saveContent(CONFIG_KEY, JSON.stringify(config));
 
-function navIdFromHref(href) {
+export function navIdFromHref(href) {
     if (!href) return null;
     const m = href.match(/^page\.html\?p=(.+)$/);
     if (m) return 'c:' + decodeURIComponent(m[1]);

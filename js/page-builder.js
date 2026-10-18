@@ -2,8 +2,8 @@
 // blocs, gestion des pages (dupliquer, créer, renommer, masquer, supprimer).
 import { supabase } from './config.js';
 import {
-    CONFIG_KEY, STATIC_PAGES, currentPageId, getContentNodes, isLayoutLocked,
-    layoutKeyFor, navEntries, newKey, pageUrl, parseConfig, rekey, saveConfig, saveContent,
+    CONFIG_KEY, STATIC_PAGES, currentPageId, getContentNodes, isCustomId, isLayoutLocked,
+    layoutKeyFor, navEntries, navIdFromHref, newKey, pageUrl, parseConfig, rekey, saveConfig, saveContent,
     serializeContent, slugify,
 } from './site.js';
 
@@ -589,6 +589,84 @@ function renderManager(config) {
     box.appendChild(footer);
 }
 
+
+// ======================================================================
+// Onglets du menu : renommer / supprimer / ajouter (au survol, en mode édition)
+// ======================================================================
+
+function navPages() {
+    return [...document.querySelectorAll('#navMenu > li')].filter(li =>
+        !li.classList.contains('nav-login') && !li.classList.contains('user-menu-item') && !li.classList.contains('pb-nav-add'));
+}
+
+async function renameTab(id, li) {
+    const link = li.querySelector('a.nav-link');
+    const title = prompt('Nouveau nom de l\'onglet :', link.textContent.trim());
+    if (title === null || !title.trim()) return;
+    try {
+        const config = await fetchConfig();
+        const custom = config.custom.find(c => 'c:' + c.id === id);
+        if (custom) custom.title = title.trim(); else config.labels[id] = title.trim();
+        await saveConfig(config);
+        window.siteConfig = config;
+        link.textContent = title.trim();
+        flash('✔ Onglet renommé');
+    } catch (e) { alert('Erreur : ' + e.message); }
+}
+
+async function removeTab(id, li) {
+    const link = li.querySelector('a.nav-link');
+    const staticPage = STATIC_PAGES.find(p => p.id === id);
+    if (staticPage && staticPage.protected) { alert('Cette page ne peut pas être supprimée.'); return; }
+    if (!confirm(`Supprimer la page « ${link.textContent.trim()} » ?` + (isCustomId(id) ? '' : '\n(Elle sera retirée du site et pourra être rétablie depuis « Pages ».)'))) return;
+    try {
+        const config = await fetchConfig();
+        if (isCustomId(id)) {
+            config.custom = config.custom.filter(c => 'c:' + c.id !== id);
+            config.order = config.order.filter(i => i !== id);
+        } else if (!config.hidden.includes(id)) {
+            config.hidden.push(id);
+        }
+        await saveConfig(config);
+        if (id === currentPageId()) { location.href = 'index.html'; return; }
+        li.remove();
+        flash('✔ Page supprimée');
+    } catch (e) { alert('Erreur : ' + e.message); }
+}
+
+function decorateNav() {
+    const menu = document.getElementById('navMenu');
+    if (!menu) return;
+    navPages().forEach(li => {
+        if (li.querySelector('.pb-nav-tools')) return;
+        const a = li.querySelector('a.nav-link');
+        const id = a && navIdFromHref(a.getAttribute('href'));
+        if (!id) return;
+        const tools = document.createElement('span');
+        tools.className = 'pb-nav-tools';
+        tools.setAttribute('data-admin-ui', '');
+        tools.appendChild(btn('✏️ Renommer', 'Renommer cet onglet', () => renameTab(id, li)));
+        const staticPage = STATIC_PAGES.find(p => p.id === id);
+        if (!(staticPage && staticPage.protected)) tools.appendChild(btn('🗑', 'Supprimer cette page', () => removeTab(id, li), 'pb-danger'));
+        li.appendChild(tools);
+    });
+    if (!menu.querySelector('.pb-nav-add')) {
+        const li = document.createElement('li');
+        li.className = 'pb-nav-add';
+        li.setAttribute('data-admin-ui', '');
+        li.appendChild(btn('＋ Page', 'Créer une nouvelle page', (e) => showMenu(e.currentTarget, [
+            { label: '＋ Nouvelle page vierge', run: createBlankPage },
+            { label: '⧉ Dupliquer la page actuelle', run: duplicateCurrentPage },
+            { label: '📄 Gérer toutes les pages', run: openPagesManager },
+        ], 'Pages du site'), 'pb-nav-add-btn'));
+        menu.insertBefore(li, menu.querySelector('.nav-login') || null);
+    }
+}
+
+function undecorateNav() {
+    document.querySelectorAll('#navMenu .pb-nav-tools, #navMenu .pb-nav-add').forEach(n => n.remove());
+}
+
 // ======================================================================
 // Démarrage / arrêt
 // ======================================================================
@@ -625,6 +703,8 @@ export function start() {
     active = true;
     ensureUi();
     panel.style.display = 'flex';
+    decorateNav();
+    window.addEventListener('site-content-loaded', decorateNav);
     document.addEventListener('mouseover', onPointerOver);
     document.addEventListener('mouseout', onPointerLeave);
     document.addEventListener('mousedown', onDocClick);
@@ -638,6 +718,8 @@ export function stop() {
     hideTools();
     closeMenu();
     closeModal();
+    undecorateNav();
+    window.removeEventListener('site-content-loaded', decorateNav);
     if (panel) panel.style.display = 'none';
     document.removeEventListener('mouseover', onPointerOver);
     document.removeEventListener('mouseout', onPointerLeave);

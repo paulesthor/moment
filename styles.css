@@ -2256,3 +2256,16 @@ img.user-image { display: block; max-width: 100%; height: auto; margin: 1rem aut
   .pb-page-tags { display: none; }
   .pb-panel { left: 8px; bottom: 8px; }
 }
+
+/* Onglets du menu en mode édition */
+#navMenu > li { position: relative; }
+.pb-nav-tools {
+  display: none; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+  z-index: 9996; gap: 2px; padding: 3px; background: #1f3329; border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, .3); white-space: nowrap;
+}
+#navMenu > li:hover > .pb-nav-tools { display: flex; }
+.pb-nav-tools .pb-btn { height: 26px; font-size: 12px; }
+#navMenu > li.pb-nav-add { display: flex; align-items: center; }
+.pb-nav-add-btn { background: #4f7d65; color: #fff; height: 28px; font-size: 12px; }
+.pb-nav-add-btn:hover { background: #3f6a54; }
