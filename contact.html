@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="fonts/fonts.css">
   <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body data-layout="locked">
 
   <nav class="navbar" id="navbar">
     <div class="nav-container">
@@ -22,10 +22,8 @@
       <button class="menu-toggle" id="menuToggle" aria-label="Ouvrir le menu"><span></span><span></span><span></span></button>
       <ul class="nav-menu" id="navMenu">
         <li><a href="index.html"              class="nav-link">Accueil</a></li>
-        <li><a href="massage-ayurvedique.html" class="nav-link">Ayurvédique</a></li>
-        <li><a href="amma-assis.html"          class="nav-link">Amma Assis</a></li>
-        <li><a href="massage-prenatal.html"    class="nav-link">Prénatal</a></li>
-        <li><a href="magnetisme-reiki.html"    class="nav-link">Magnétisme</a></li>
+        <li><a href="massage.html" class="nav-link">Massage</a></li>
+        <li><a href="soins-energetiques.html"          class="nav-link">Soins énergétiques</a></li>
         <li><a href="tarifs.html"              class="nav-link">Tarifs</a></li>
         <li><a href="a-propos.html"            class="nav-link">À Propos</a></li>
         <li><a href="temoignages.html"         class="nav-link">Témoignages</a></li>
@@ -36,12 +34,12 @@
   </nav>
 
   <section class="page-banner">
-    <img src="Gemini_Generated_Image_36tfxk36tfxk36tf.png" alt="Contact" class="hero-background">
+    <img src="Gemini_Generated_Image_36tfxk36tfxk36tf.png" alt="Contact" class="hero-background" data-image-key="contact_auto_img1">
     <div class="hero-overlay"></div>
     <div class="page-banner-content">
-      <p class="page-banner-label">Moments d'Évasion &middot; Montamisé</p>
-      <h1 class="page-banner-title">Contact</h1>
-      <p class="page-banner-sub">Prenez rendez-vous pour votre moment d'évasion</p>
+      <p class="page-banner-label" data-content-key="contact_auto_t1">Moments d'Évasion &middot; Montamisé</p>
+      <h1 class="page-banner-title" data-content-key="contact_auto_t2">Contact</h1>
+      <p class="page-banner-sub" data-content-key="contact_auto_t3">Prenez rendez-vous pour votre moment d'évasion</p>
     </div>
   </section>
 
@@ -53,84 +51,84 @@
         <!-- ESPACE CLIENT -->
         <div class="reveal">
           <div class="contact-form" style="height:100%; display:flex; flex-direction:column;">
-            <span class="eyebrow" style="margin-bottom:var(--s3);">Espace client</span>
-            <h2 style="font-size:var(--t-h2); margin-bottom:var(--s3);">Envie d'un rendez-vous&nbsp;?</h2>
+            <span class="eyebrow" style="margin-bottom:var(--s3);" data-content-key="contact_auto_t4">Espace client</span>
+            <h2 style="font-size:var(--t-h2); margin-bottom:var(--s3);" data-content-key="contact_auto_t5">Envie d'un rendez-vous&nbsp;?</h2>
 
             <div id="contact-greeting" style="margin-bottom:var(--s4); color:var(--stone); line-height:1.7;">
-              Pour une prise en charge rapide et un suivi personnalisé, nous vous invitons à utiliser votre <strong>Espace Client</strong>.
+              Pour une prise en charge rapide et un suivi personnalisé, nous vous invitons à utiliser votre <strong data-content-key="contact_auto_t6">Espace Client</strong>.
             </div>
 
             <ul style="list-style:none; margin-bottom:var(--s5); display:flex; flex-direction:column; gap:var(--s3);">
-              <li style="display:flex; gap:var(--s2); align-items:center;">
+              <li style="display:flex; gap:var(--s2); align-items:center;" data-content-key="contact_auto_t7">
                 <span style="width:36px; height:36px; background:var(--sage-50); border:1px solid var(--sage-100); border-radius:2px; display:flex; align-items:center; justify-content:center; font-size:.9rem; flex-shrink:0; color:var(--sage-600);">✉</span>
                 <span style="color:var(--stone); font-size:.9375rem;">Messagerie directe avec Michèle</span>
               </li>
-              <li style="display:flex; gap:var(--s2); align-items:center;">
+              <li style="display:flex; gap:var(--s2); align-items:center;" data-content-key="contact_auto_t8">
                 <span style="width:36px; height:36px; background:var(--sage-50); border:1px solid var(--sage-100); border-radius:2px; display:flex; align-items:center; justify-content:center; font-size:.9rem; flex-shrink:0; color:var(--sage-600);">&#8635;</span>
                 <span style="color:var(--stone); font-size:.9375rem;">Prise de rendez-vous en ligne</span>
               </li>
-              <li style="display:flex; gap:var(--s2); align-items:center;">
+              <li style="display:flex; gap:var(--s2); align-items:center;" data-content-key="contact_auto_t9">
                 <span style="width:36px; height:36px; background:var(--sage-50); border:1px solid var(--sage-100); border-radius:2px; display:flex; align-items:center; justify-content:center; font-size:.9rem; flex-shrink:0; color:var(--sage-600);">☰</span>
                 <span style="color:var(--stone); font-size:.9375rem;">Historique de vos échanges</span>
               </li>
             </ul>
 
             <div id="view-guest" style="display:flex; gap:var(--s2); flex-wrap:wrap; margin-top:auto;">
-              <a href="login.html" class="btn btn-primary" style="flex:1;">Se connecter</a>
-              <a href="register.html" class="btn btn-outline" style="flex:1;">Créer un compte</a>
+              <a href="login.html" class="btn btn-primary" style="flex:1;" data-content-key="contact_auto_t10">Se connecter</a>
+              <a href="register.html" class="btn btn-outline" style="flex:1;" data-content-key="contact_auto_t11">Créer un compte</a>
             </div>
 
             <div id="view-auth" style="display:none; gap:var(--s2); margin-top:auto;">
-              <a href="dashboard.html" class="btn btn-primary" style="width:100%;">Accéder à mon Espace</a>
+              <a href="dashboard.html" class="btn btn-primary" style="width:100%;" data-content-key="contact_auto_t12">Accéder à mon Espace</a>
             </div>
 
             <p id="footer-login-msg" style="margin-top:var(--s4); padding-top:var(--s3); border-top:1px solid var(--parchment); font-size:.875rem; color:var(--mist); text-align:center;">
-              Déjà connecté ? <a href="dashboard.html" style="color:var(--sage-600); font-weight:600;">Accéder au Tableau de Bord</a>
+              Déjà connecté ? <a href="dashboard.html" style="color:var(--sage-600); font-weight:600;" data-content-key="contact_auto_t13">Accéder au Tableau de Bord</a>
             </p>
           </div>
         </div>
 
         <!-- COORDONNÉES -->
         <div class="reveal">
-          <span class="eyebrow" style="margin-bottom:var(--s3);">Nous trouver</span>
-          <h2 style="font-size:var(--t-h2); margin-bottom:var(--s5);">Nos coordonnées</h2>
+          <span class="eyebrow" style="margin-bottom:var(--s3);" data-content-key="contact_auto_t14">Nous trouver</span>
+          <h2 style="font-size:var(--t-h2); margin-bottom:var(--s5);" data-content-key="contact_auto_t15">Nos coordonnées</h2>
 
           <div class="contact-item">
             <span class="contact-icon">&#9679;</span>
             <div>
-              <strong style="display:block; color:var(--forest); font-size:.8rem; letter-spacing:.1em; text-transform:uppercase; margin-bottom:.3rem;">Adresse</strong>
-              <p style="margin:0; color:var(--stone);">7 Ter Rue des Sables<br>86360 MONTAMISÉ<br><span style="font-size:.875rem; color:var(--mist);">Près de Poitiers</span></p>
+              <strong style="display:block; color:var(--forest); font-size:.8rem; letter-spacing:.1em; text-transform:uppercase; margin-bottom:.3rem;" data-content-key="contact_auto_t16">Adresse</strong>
+              <p style="margin:0; color:var(--stone);" data-content-key="contact_auto_t17">7 Ter Rue des Sables<br>86360 MONTAMISÉ<br><span style="font-size:.875rem; color:var(--mist);">Près de Poitiers</span></p>
             </div>
           </div>
 
           <div class="contact-item">
             <span class="contact-icon">&#9679;</span>
             <div>
-              <strong style="display:block; color:var(--forest); font-size:.8rem; letter-spacing:.1em; text-transform:uppercase; margin-bottom:.3rem;">Téléphone</strong>
-              <p style="margin:0;"><a href="tel:0631856831" style="color:var(--sage-600); font-weight:600;">06 31 85 68 31</a></p>
-              <p style="font-size:.875rem; color:var(--mist); margin:0;">Du lundi au samedi</p>
+              <strong style="display:block; color:var(--forest); font-size:.8rem; letter-spacing:.1em; text-transform:uppercase; margin-bottom:.3rem;" data-content-key="contact_auto_t18">Téléphone</strong>
+              <p style="margin:0;" data-content-key="contact_auto_t19"><a href="tel:0631856831" style="color:var(--sage-600); font-weight:600;">06 31 85 68 31</a></p>
+              <p style="font-size:.875rem; color:var(--mist); margin:0;" data-content-key="contact_auto_t20">Du lundi au samedi</p>
             </div>
           </div>
 
           <div class="contact-item">
             <span class="contact-icon">&#9679;</span>
             <div>
-              <strong style="display:block; color:var(--forest); font-size:.8rem; letter-spacing:.1em; text-transform:uppercase; margin-bottom:.3rem;">Email</strong>
-              <p style="margin:0; color:var(--stone);">contact@moment-evasion.fr</p>
+              <strong style="display:block; color:var(--forest); font-size:.8rem; letter-spacing:.1em; text-transform:uppercase; margin-bottom:.3rem;" data-content-key="contact_auto_t21">Email</strong>
+              <p style="margin:0; color:var(--stone);" data-content-key="contact_auto_t22">contact@moment-evasion.fr</p>
             </div>
           </div>
 
           <div class="contact-item">
             <span class="contact-icon">&#9679;</span>
             <div>
-              <strong style="display:block; color:var(--forest); font-size:.8rem; letter-spacing:.1em; text-transform:uppercase; margin-bottom:.3rem;">SIRET</strong>
-              <p style="margin:0; color:var(--mist); font-size:.875rem;">829 717 636 00015</p>
+              <strong style="display:block; color:var(--forest); font-size:.8rem; letter-spacing:.1em; text-transform:uppercase; margin-bottom:.3rem;" data-content-key="contact_auto_t23">SIRET</strong>
+              <p style="margin:0; color:var(--mist); font-size:.875rem;" data-content-key="contact_auto_t24">829 717 636 00015</p>
             </div>
           </div>
 
           <div class="info-card" style="margin-top:var(--s4);">
-            <h3 style="font-size:1rem;">Déplacement possible</h3>
-            <p style="font-size:.9rem; margin:0;">Pour les personnes à mobilité réduite, Michèle se déplace à domicile autour de Poitiers.</p>
+            <h3 style="font-size:1rem;" data-content-key="contact_auto_t25">Déplacement possible</h3>
+            <p style="font-size:.9rem; margin:0;" data-content-key="contact_auto_t26">Pour les personnes à mobilité réduite, Michèle se déplace à domicile autour de Poitiers.</p>
           </div>
         </div>
 
@@ -141,33 +139,31 @@
   <footer class="footer">
     <div class="footer-inner">
       <div class="footer-brand">
-        <img src="Gemini_Generated_Image_36tfxk36tfxk36tf-removebg-preview.png" alt="Moments d'Évasion" class="footer-logo">
-        <p>Votre espace de bien-être et de sérénité à Montamisé, près de Poitiers.</p>
+        <img src="Gemini_Generated_Image_36tfxk36tfxk36tf-removebg-preview.png" alt="Moments d'Évasion" class="footer-logo" data-image-key="footer_auto_logo">
+        <p data-content-key="footer_auto_c31381">Votre espace de bien-être et de sérénité à Montamisé, près de Poitiers.</p>
       </div>
       <nav class="footer-nav">
-        <h4 class="footer-heading">Soins</h4>
+        <h4 class="footer-heading" data-content-key="footer_auto_3f4e3f">Soins</h4>
         <ul class="footer-links">
-          <li><a href="massage-ayurvedique.html">Massage Ayurvédique</a></li>
-          <li><a href="amma-assis.html">Massage Amma Assis</a></li>
-          <li><a href="massage-prenatal.html">Massage Prénatal</a></li>
-          <li><a href="magnetisme-reiki.html">Magnétisme &amp; Reiki</a></li>
+          <li data-content-key="footer_auto_massage"><a href="massage.html">Massage</a></li>
+          <li data-content-key="footer_auto_soins"><a href="soins-energetiques.html">Soins énergétiques</a></li>
         </ul>
       </nav>
       <div class="footer-info">
-        <h4 class="footer-heading">Contact</h4>
+        <h4 class="footer-heading" data-content-key="footer_auto_53d26a">Contact</h4>
         <address>
-          <p>7 Ter Rue des Sables<br>86360 MONTAMISÉ</p>
-          <p><a href="tel:0631856831">06 31 85 68 31</a></p>
+          <p data-content-key="footer_auto_234a29">7 Ter Rue des Sables<br>86360 MONTAMISÉ</p>
+          <p data-content-key="footer_auto_a920df"><a href="tel:0631856831">06 31 85 68 31</a></p>
         </address>
       </div>
       <div class="footer-rdv">
-        <h4 class="footer-heading">Rendez-vous</h4>
-        <p>Sur rendez-vous uniquement</p>
-        <a href="contact.html" class="btn btn-accent">Nous contacter</a>
+        <h4 class="footer-heading" data-content-key="footer_auto_ea5df1">Rendez-vous</h4>
+        <p data-content-key="footer_auto_fa3d20">Sur rendez-vous uniquement</p>
+        <a href="contact.html" class="btn btn-accent" data-content-key="footer_auto_704378">Nous contacter</a>
       </div>
     </div>
     <div class="footer-bottom">
-      <p>&copy; 2026 Moments d'Évasion &mdash; Tous droits réservés</p>
+      <p data-content-key="footer_auto_045a11">&copy; 2026 Moments d'Évasion &mdash; Tous droits réservés</p>
     </div>
   </footer>
 
@@ -175,6 +171,7 @@
   <script src="js/cookies.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module" src="js/auth.js"></script>
+  <script type="module" src="js/admin.js"></script>
   <script type="module">
     import { supabase } from './js/config.js';
     async function checkStatus() {

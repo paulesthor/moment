@@ -84,6 +84,10 @@ async function checkUserRole(user) {
         if (data && data.role === 'admin') {
             document.body.classList.add('is-admin');
             console.log('Admin mode enabled');
+            // Le mode édition reste actif quand l'admin navigue d'une page à l'autre
+            try {
+                if (sessionStorage.getItem('mde_edit_mode') === '1') document.body.classList.add('edit-mode');
+            } catch (e) { /* stockage indisponible */ }
             window.dispatchEvent(new CustomEvent('admin-mode-enabled'));
         } else {
             document.body.classList.remove('is-admin');
@@ -199,6 +203,7 @@ function createUserMenu(user) {
 
             toggleBtn.addEventListener('click', () => {
                 editModeActive = !editModeActive;
+                try { sessionStorage.setItem('mde_edit_mode', editModeActive ? '1' : '0'); } catch (e) { /* ignore */ }
                 toggleBtn.textContent = editModeActive ? '✏️ Mode Édition: ON' : '✏️ Mode Édition: OFF';
 
                 if (editModeActive) {
